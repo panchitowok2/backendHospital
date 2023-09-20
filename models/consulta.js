@@ -8,6 +8,8 @@ let esquemaConsulta =  new mongoose.Schema({
     fecha_y_hora:{type:Date, required:true},
     medico:{type:mongoose.Schema.Types.ObjectId,ref:"medico",required: true},
     turno:{type:mongoose.Schema.Types.ObjectId,ref:"turno",required: false}
+}, {
+    collection: 'consulta' // Nombre personalizado para la colección
 })
 
 export default mongoose.model('consulta', esquemaConsulta)

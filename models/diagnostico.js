@@ -9,13 +9,15 @@ let esquemaDiagnostico = new mongoose.Schema({
     consulta: {
         type:mongoose.Schema.Types.ObjectId,
         ref: "consulta",
-        required: true
+        required: true 
     },
     enfermedad: {
         type:mongoose.Schema.Types.ObjectId,
         ref: "enfermedad",
         required: true
     }
+}, {
+    collection: 'diagnostico' // Nombre personalizado para la colección
 })
 
 export default mongoose.model('diagnostico', esquemaDiagnostico)

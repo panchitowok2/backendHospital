@@ -11,6 +11,6 @@ let esquemaDosificacion = new mongoose.Schema({
     }
 }, {
     collection: 'dosificacion' // Nombre personalizado para la colección
-  })
+})
 
 export default mongoose.model('dosificacion', esquemaDosificacion)

@@ -17,6 +17,8 @@ let esquemaTurno = new Schema({
         ref: 'persona',
         required: true
     }
+}, {
+    collection: 'turno' // Nombre personalizado para la colección
 })
 
 export default mongoose.model('Turno', esquemaTurno)

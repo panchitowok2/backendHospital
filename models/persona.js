@@ -28,6 +28,8 @@ let esquemaPersona = new mongoose.Schema({
       required: false
     },
   sexo:{type:String, required:true}
+}, {
+  collection: 'persona' // Nombre personalizado para la colección
 })
   
 export default mongoose.model('persona', esquemaPersona)

@@ -11,13 +11,15 @@ let esquemaTratamientoFarmacologico = new mongoose.Schema({
     duracion: {type: String, required: true},
     diagnostico: {type: mongoose.Schema.Types.ObjectId,ref:"diagnostico",  required: true},
     medico: {type: mongoose.Schema.Types.ObjectId, ref:"medico",required: true},
-    dosificacion: [
+    dosificaciones: [
         {
           type: mongoose.Schema.Types.ObjectId,
           ref: "dosificacion",
           required: true
         }
       ],
+}, {
+  collection: 'tratamiento_farmacologico' // Nombre personalizado para la colección
 })
 
 export default mongoose.model('tratamiento_farmacologico', esquemaTratamientoFarmacologico)

@@ -27,6 +27,8 @@ let esquemaHistoriaClinica = new mongoose.Schema({
           default: [] // nombre del modelo al que se hace referencia
         }
       ]
+}, {
+  collection: 'historia_clinica' // Nombre personalizado para la colección
 })
 
 export default mongoose.model('historia_clinica', esquemaHistoriaClinica)
