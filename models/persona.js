@@ -4,7 +4,6 @@ import validator from 'validator'
 import historia_clinica from './historia_clinica.js'
 
 let esquemaPersona = new mongoose.Schema({
-    cuit:{type:Number,required:true},
     tipo_documento:{type:String, required:true},
     documento: {type: Number, required: true},
     nombre: {type: String, required: true},
@@ -27,7 +26,16 @@ let esquemaPersona = new mongoose.Schema({
       ref:"historia_clinica",
       required: false
     },
-  sexo:{type:String, required:true}
+    sexo: {
+      type: String,
+      required: true,
+      validate: {
+        validator: function(value) {
+          return ['M', 'F'].includes(value);
+        },
+        message: 'El campo sexo debe ser "M" o "F"'
+      }
+    }
 }, {
   collection: 'persona' // Nombre personalizado para la colección
 })
