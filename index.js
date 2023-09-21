@@ -7,7 +7,7 @@ import bodyParser from 'body-parser'
 import {PORT, url} from './config.js'
 import ruta_persona from './routes/ruta_persona.js'
 import persona from './models/persona.js'
-
+import ruta_historia_clinica from './routes/ruta_historia_clinica.js'
 const app = express()
 
 // Creamos el servidor con el modulo http por defecto en NodeJS
@@ -22,29 +22,11 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 app.use('/api', ruta_persona)
-
+app.use('/api', ruta_historia_clinica)
 // Conexion a la base de datos
 mongoose.connect(url).then(() => {
     console.log('Conexion a la base de datos establecida')
-      
-    const nuevaPersona = new persona({
-        tipo_documento: 'DNI', 
-        documento: 13483325, 
-        apellido: 'Fabi', 
-        nombre: 'Jose', 
-        sexo: 'M', 
-        cuit: '20134833246', 
-        nacionalidad: 'Argentina', 
-        fecha_nacimiento: new Date('1959-12-16'),
-        email: "papafrita123@gmail.com"
-    })
-        nuevaPersona.save().then(() => {
-        console.log('Document saved successfully');
-      })
-      .catch((error) => {
-        console.error('Error saving the document:', error);
-      })
-
+    
     // Escucha al puerto 
     server.listen(PORT, () => {
         console.log('Servidor ejecutandose en http://localhost:', PORT)

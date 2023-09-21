@@ -9,6 +9,8 @@ let esquemaMedico =  new mongoose.Schema({
    fecha_graduacion: {type:Date, required:true},
    especialidad: [{type:mongoose.Schema.Types.ObjectId,ref:"especialidad",required: true}],
    persona: {type:mongoose.Schema.Types.ObjectId,ref:"persona",required: true}
-})
+}, {
+   collection: 'medico' // Nombre personalizado para la colección
+ })
 
 export default mongoose.model('medico', esquemaMedico)

@@ -16,6 +16,8 @@ let esquemaDiagnostico = new mongoose.Schema({
         ref: "enfermedad",
         required: true
     }
-})
+},{
+    collection: 'diagnostico' // Nombre personalizado para la colección
+  })
 
 export default mongoose.model('diagnostico', esquemaDiagnostico)

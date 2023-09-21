@@ -18,6 +18,8 @@ let esquemaTratamientoFarmacologico = new mongoose.Schema({
           required: true
         }
       ],
+}, {
+  collection: 'tratamiento_farmacologico' // Nombre personalizado para la colección
 })
 
 export default mongoose.model('tratamiento_farmacologico', esquemaTratamientoFarmacologico)
