@@ -1,6 +1,7 @@
 import mongoose from 'mongoose'
 import {url} from '../config.js'
 import Persona from '../models/persona.js'
+import HistoriaClinica from '../models/historia_clinica.js'
 
 mongoose.connect(url).then(async () => {
   console.log('Conexion a la base de datos establecida')
@@ -35,10 +36,22 @@ mongoose.connect(url).then(async () => {
     
   ];
 
+  const gruposSanguineos = ["A", "B", "AB", "O"];
+  const factores_sanguineos = ["+", "-"];
+
   for (const persona of personas) {
+    const grupoAleatorio = Math.floor(Math.random() * gruposSanguineos.length);
+    const factorAleatorio = Math.floor(Math.random() * factores_sanguineos.length);
+
+    const nuevaHistoriaClinica = new HistoriaClinica({
+      grupo_sanguineo: gruposSanguineos[grupoAleatorio],
+      factor_sanguineo: factores_sanguineos[factorAleatorio]
+    })
+    persona.historia_clinica = nuevaHistoriaClinica._id
+
     const nuevaPersona = new Persona(persona);
     await nuevaPersona.save();
-    
+
     console.log(`Persona "${persona.nombre} ${persona.apellido}" insertada.`);
   }
 
