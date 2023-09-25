@@ -47,6 +47,8 @@ mongoose.connect(url).then(async () => {
       grupo_sanguineo: gruposSanguineos[grupoAleatorio],
       factor_sanguineo: factores_sanguineos[factorAleatorio]
     })
+    await nuevaHistoriaClinica.save();
+
     persona.historia_clinica = nuevaHistoriaClinica._id
 
     const nuevaPersona = new Persona(persona);
