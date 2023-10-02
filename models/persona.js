@@ -5,7 +5,7 @@ import historia_clinica from './historia_clinica.js'
 
 let esquemaPersona = new mongoose.Schema({
     cuit:{type:Number,required:true},
-    tipo_documento:{type:String, required:true},
+    tipo_documento:{type:String, required:true, enum:['DNI','Libreta']},
     documento: {type: Number, required: true},
     nombre: {type: String, required: true},
     apellido: {type: String, required: true},

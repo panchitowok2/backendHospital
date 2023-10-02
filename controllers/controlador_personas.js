@@ -9,7 +9,7 @@ var controller = {
       Persona.findOne({
         tipo_documento: params.tipo_documento, 
         documento: params.documento, 
-        sexo: params.sexo, 
+        sexo: params.sexo,
         apellido: params.apellido
       }).then(personaBuscada => { 
         //si la persona no pude ser encontrada devuelve este error    
