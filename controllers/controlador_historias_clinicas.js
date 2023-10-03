@@ -1,18 +1,13 @@
 import historia_clinica from '../models/historia_clinica.js';
 import persona from '../models/persona.js'
 import mongoose from 'mongoose';
-
+import controladorPersona from './controlador_personas.js';
 var controller = {
     //buscar historia clinica segun datos de paciente
     buscarHistoriaClinica: async (req, res) => {
         var params = req.body
 
-        var personaBuscada = await persona.findOne({
-            documento: params.documento,
-            tipo_documento: params.tipo_documento,
-            apellido: params.apellido,
-            sexo: params.sexo
-        })
+        var personaBuscada = await controladorPersona.buscarPersona(req, res)
         await historia_clinica.findOne({
             _id: personaBuscada.historia_clinica
         }).then(historiaClinicaBuscada => {
@@ -23,7 +18,7 @@ var controller = {
               message: 'No existe la historia clinica'
             })
           }
-          //si la persona fue encontrada devolvemos esto
+          //si la historia clinica fue encontrada devolvemos esto
           return res.status(200).send({
               grupo_sanguineo: historiaClinicaBuscada.grupo_sanguineo,
               factor_sanguineo: historiaClinicaBuscada.factor_sanguineo,
