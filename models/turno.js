@@ -8,15 +8,17 @@ let esquemaTurno = new Schema({
     fecha: Date,
     hora: String,
     medico: {
-        type:mongoose.Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'medico',
         required: true
     },
     persona: {
-        type:mongoose.Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'persona',
         required: true
     }
+}, {
+    collection: 'turno' // Nombre personalizado para la colección
 })
 
-export default mongoose.model('Turno', esquemaTurno)
+export default mongoose.model('turno', esquemaTurno)
