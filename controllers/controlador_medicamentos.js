@@ -27,8 +27,6 @@ var controller = {
       const fechaFinal = new Date(params.fecha_final)
       const especialidadId = new mongoose.Types.ObjectId(params.especialidad);
 
-      console.log(params)
-
       const resultado = await TratamientoFarmacologico.aggregate([
         {
           $match: {
