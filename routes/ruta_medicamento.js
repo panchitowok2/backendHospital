@@ -29,7 +29,7 @@ const verificarEspecialidad = async (req, res, next) => {
       if (!especialidad) {
         return res.status(404).json({ mensaje: 'Especialidad no encontrada' });
       }
-      console.log(especialidad)
+     
       // Aceptar la solicitud
       next();
     } catch (error) {
