@@ -7,7 +7,7 @@ let esquemaMedico =  new mongoose.Schema({
    matricula: {type:String, required:true},
    titulo: {type:String, required:true},
    fecha_graduacion: {type:Date, required:true},
-   especialidad: [{type:mongoose.Schema.Types.ObjectId,ref:"especialidad",required: true}],
+   especialidades: [{type:mongoose.Schema.Types.ObjectId,ref:"especialidad",required: true}],
    persona: {type:mongoose.Schema.Types.ObjectId,ref:"persona",required: true}
 }, {
    collection: 'medico' // Nombre personalizado para la colección

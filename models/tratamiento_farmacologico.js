@@ -11,7 +11,7 @@ let esquemaTratamientoFarmacologico = new mongoose.Schema({
     duracion: {type: String, required: true},
     diagnostico: {type: mongoose.Schema.Types.ObjectId,ref:"diagnostico",  required: true},
     medico: {type: mongoose.Schema.Types.ObjectId, ref:"medico",required: true},
-    dosificacion: [
+    dosificaciones: [
         {
           type: mongoose.Schema.Types.ObjectId,
           ref: "dosificacion",

@@ -6,7 +6,7 @@ import diagnosticos from './diagnostico.js'
 let esquemaHistoriaClinica = new mongoose.Schema({
     grupo_sanguineo: {type: String, required: true, enum:['AB','A','B','O']},
     factor_sanguineo: {type: String, required: true, enum:['+','-']},
-    tratamiento_farmacologico: [
+    tratamientos_farmacologicos: [
         {
           type: mongoose.Schema.Types.ObjectId,
           ref: "tratamiento_farmacologico",
