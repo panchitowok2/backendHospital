@@ -109,36 +109,36 @@ var controller = {
             _id: new mongoose.Types.ObjectId(params._id)
           }
         },
-        {                   
+        {
           $lookup: {
             from: "historia_clinica",
             localField: "historia_clinica",
             foreignField: "_id",
-            as: "historia_clinica2"
+            as: "historia_clinica"
           }
         },
         {
           $lookup: {
             from: "tratamiento_farmacologico",
-            localField: "historia_clinica2.tratamientos_farmacologicos",
+            localField: "historia_clinica.tratamientos_farmacologicos",
             foreignField: "_id",
-            as: "tratamientos_farmacologicos2"
+            as: "tratamientos_farmacologicos"
           }
         },
-                
+
         {
           $lookup: {
             from: "consulta",
-            localField: "historia_clinica2.consultas",
+            localField: "historia_clinica.consultas",
             foreignField: "_id",
             as: "consultas"
           }
         },
-        
+
         {
           $lookup: {
             from: "diagnostico",
-            localField: "tratamientos_farmacologicos2.diagnostico",
+            localField: "tratamientos_farmacologicos.diagnostico",
             foreignField: "_id",
             as: "diagnosticos_tratamiento"
           }
@@ -162,7 +162,7 @@ var controller = {
         {
           $lookup: {
             from: "medico",
-            localField: "tratamientos_farmacologicos2.medico",
+            localField: "tratamientos_farmacologicos.medico",
             foreignField: "_id",
             as: "medicosDeTratamientosFarmacologicos"
           }
@@ -178,7 +178,7 @@ var controller = {
         {
           $lookup: {
             from: "dosificacion",
-            localField: "tratamientos_farmacologicos2.dosificaciones",
+            localField: "tratamientos_farmacologicos.dosificaciones",
             foreignField: "_id",
             as: "dosificacionesTratamientosFarmacologicos"
           }
@@ -194,20 +194,75 @@ var controller = {
         {
           $project: {
             _id: 0, // Elimina el campo _id de la salida
-            "historia_clinica2._id": 0,
-            "historia_clinica2.tratamientos_farmacologicos": 0,
-            "historia_clinica2.consultas": 0,
-            "historia_clinica2.diagnosticos": 0,
-            "historia_clinica2.__v": 0,
+            "historia_clinica._id": 0,
+            "historia_clinica.tratamientos_farmacologicos": 0,
+            "historia_clinica.consultas": 0,
+            "historia_clinica.diagnosticos": 0,
+            "historia_clinica.__v": 0,
+            "tratamientos_farmacologicos._id": 0,
+            "tratamientos_farmacologicos.diagnostico": 0,
+            "tratamientos_farmacologicos.medico": 0,
+            "tratamientos_farmacologicos.dosificaciones": 0,
+            "tratamientos_farmacologicos.__v": 0,
+            "consultas._id": 0,
+            "consultas.medico": 0,
+            "consultas.turno": 0,
+            "consultas.__v": 0,
+            "diagnosticos_tratamiento._id": 0,
+            "diagnosticos_tratamiento.consulta": 0,
+            "diagnosticos_tratamiento.enfermedad": 0,
+            "diagnosticos_tratamiento.__v": 0,
+            "medicos._id":0,
+            "medicos.especialidades":0,
+            "medicos.persona":0,
+            "medicos.__v":0,
+            "datosPersonalesMedicoQueAtendioConsulta._id":0,
+            "datosPersonalesMedicoQueAtendioConsulta.historia_clinica":0,
+            "datosPersonalesMedicoQueAtendioConsulta.__v":0,
+            "medicosDeTratamientosFarmacologicos._id":0,
+            "medicosDeTratamientosFarmacologicos.historia_clinica":0,
+            "medicosDeTratamientosFarmacologicos.__v":0,
+            "datosPersonalesMedicoQueRecetoTratamientoFarmacologico._id":0,
+            "datosPersonalesMedicoQueRecetoTratamientoFarmacologico.historia_clinica":0,
+            "datosPersonalesMedicoQueRecetoTratamientoFarmacologico.__v":0,
+            "dosificacionesTratamientosFarmacologicos._id":0,
+            "dosificacionesTratamientosFarmacologicos.medicamento":0,
+            "dosificacionesTratamientosFarmacologicos.__v":0,
+            "medicamentoDosificacion._id":0,
+            "medicamentoDosificacion.__v":0,
           }
         }
       ])
-
-      //console.log('Resultado de la agregación:', resultado);
-      return res.status(200).send({
-        resultado
+      //console.log(resultado[0].medicos)
+      
+      const datosMedicosFinal = resultado[0].medicos.map((medico, index)=>{
+        return {
+          datosMedico: medico,
+          datosPersonales: resultado[0].datosPersonalesMedicoQueAtendioConsulta[index],
+        }
       })
+      
+      //console.log(datosMedicosFinal)
+      //console.log('Resultado de la agregación:', resultado);
+      return res.status(200).send(
+        resultado.map((resultado) => ({
+          tipo_documento: resultado.tipo_documento,
+          documento: resultado.documento,
+          nombre: resultado.nombre,
+          apellido: resultado.apellido,
+          historia_clinica: resultado.historia_clinica,
+          tratamientos_farmacologicos: resultado.tratamientos_farmacologicos,
+          consultas: resultado.consultas,
+          diagnosticos_tratamiento: resultado.diagnosticos_tratamiento,
+          datosPersonalesMedicoQueAtendioConsulta: datosMedicosFinal,
+          profesionalQueRecetoTratamiento: resultado.datosPersonalesMedicoQueRecetoTratamientoFarmacologico,
+          dosificacionDeCadaTratamiento: resultado.dosificacionesTratamientosFarmacologicos,
+          medicamentoDosificado: resultado.medicamentoDosificacion,
+
+        }))
+      )
     } catch (error) {
+      console.log(error)
       return res.status(500).send({
         error: true,
         mesagge: 'Hubo un error en la elaboracion del informe del paciente.'
@@ -215,104 +270,6 @@ var controller = {
     }
 
   }
-
-  /*
-   elaborarInformePaciente: async (req, res) => {
-     var params = req.body
- 
-     //Precondicion para este metodo: La persona existe en el sistema
-     //verifico que la historia clinica existe en la coleccion de Historias Clinicas
-     var personaBuscada = await functions.buscarPersona(params)
-     //console.log(personaBuscada)
- 
-     if (!personaBuscada) {
-       return res.status(500).send({
-         error: true,
-         message: 'La persona no existe en el sistema'
-       })
-     }
-     await historia_clinica.findOne({
-       _id: personaBuscada.historia_clinica
-     }).then(async historiaClinicaBuscada => {
-       //si la historia clinica no pude ser encontrada devuelve este error
-       if (!historiaClinicaBuscada) {
-         return res.status(404).send({
-           error: true,
-           message: 'No existe la historia clinica'
-         })
-       }
-       //buscamos los datos de las consultas, y los medicos de cada consulta
-       if (historiaClinicaBuscada.consultas.length > 0) {
-         var datosConsulta = {};
-         var datosMedicos = {};
-         var numeroConsulta = null;
-         var numeroMedico = null;
-         var datosUnaConsulta = {};
-         var datosUnMedico = {};
-         for (let i = 0; i < historiaClinicaBuscada.consultas.length; i++) {
-           numeroConsulta = `Consulta${i}`
-           numeroMedico = `Medico${i}`
-           datosUnaConsulta = await functionsConsulta.buscarConsulta(historiaClinicaBuscada.consultas[i]);
-           datosUnMedico = await functionsMedico.buscarMedico(datosUnaConsulta.medico);
-           datosMedicos[numeroMedico] = datosUnMedico;
-           datosConsulta[numeroConsulta] = datosUnaConsulta;
-         }
-       }
-       //buscamos los datos de tratamientos farmacologicos, y sus diagnosticos asociados
-       if (historiaClinicaBuscada.tratamientos_farmacologicos.length > 0) {
-         var datosTratamientos = {};
-         var datosDiagnosticos = {};
-         var datosMedicosTratamiento = {};
-         var datosDosificaciones = {};
-         var datosDosificacionesPorTratamiento = {};
-         var numeroTratamiento = null;
-         var numeroDiagnostico = null;
-         var numeroDosificacion = null;
-         var datosUnTratamiento = {};
-         var datosUnDiagnostico = {};
-         var datosUnaDosificacion = {};
-         for (let i = 0; i < historiaClinicaBuscada.tratamientos_farmacologicos.length; i++) {
-           numeroTratamiento = `TratamientoFarmacologico${i}`
-           numeroDiagnostico = `Diagnostico${i}`
-           numeroMedico = `Medico${i}`;
-           numeroDosificacion = `Dosificacion${i}`
-           datosUnTratamiento = await functionsTratamiento.buscarTratamientoFarmacologico(historiaClinicaBuscada.tratamientos_farmacologicos[i]);
-           datosUnDiagnostico = await functionsDiagnostico.buscarDiagnostico(datosUnTratamiento.diagnostico);
-           datosUnMedico = await functionsMedico.buscarMedico(datosUnTratamiento.medico);
-           for (let j = 0; j < datosUnTratamiento.dosificaciones.length; j++) {
-             datosUnaDosificacion = await functionsDosificacion.buscarDosificacion(datosUnTratamiento.dosificaciones[j]);
-             datosDosificacionesPorTratamiento[`Dosificacion${j}`] = datosUnaDosificacion;
-           }
-           datosDiagnosticos[numeroDiagnostico] = datosUnDiagnostico;
-           datosTratamientos[numeroTratamiento] = datosUnTratamiento;
-           datosMedicosTratamiento[numeroMedico] = datosUnMedico;
-           datosDosificaciones[`DosificacionesDeTratamiento${i}`] = datosDosificacionesPorTratamiento;
-         }
-       }
- 
-       //si la persona fue encontrada devolvemos esto
-       return res.status(200).send({
-         grupo_sanguineo: historiaClinicaBuscada.grupo_sanguineo,
-         factor_sanguineo: historiaClinicaBuscada.factor_sanguineo,
-         tratamientos_farmacologicos: historiaClinicaBuscada.tratamientos_farmacologicos,
-         consultas: historiaClinicaBuscada.consultas,
-         diagnosticos: historiaClinicaBuscada.diagnosticos,
-         datosDeConsultasDelPaciente: datosConsulta,
-         datosTratamientosDelPaciente: datosTratamientos,
-         datosDeDiagnosticosDeLosTratamientos: datosDiagnosticos,
-         datosDeMedicosQueAtendieronLasConsultas: datosMedicos,
-         datosDeMedicosQueIndicaronElTratamiento: datosMedicosTratamiento,
-         datosDosificacionesPorTratamiento: datosDosificaciones
-       })
-     }).catch(error => {
-       return res.status(500).send({
-         error: true,
-         message: 'No ha sido posible buscar la historia clinica' + error
-       })
-     })
- 
-   }
-   */
 }
 
 export default controller;
