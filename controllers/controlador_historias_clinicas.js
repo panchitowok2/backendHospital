@@ -56,24 +56,42 @@ var controller = {
       //inicio la transaccion
       session.startTransaction();
 
-      const historicasClinicas = await historia_clinica.create([params], { session: session });
-      hist_clinica = historicasClinicas[0];
-      const histID = hist_clinica._id;
-      console.log("La nueva historia clìnica es: " + histID);
+      var personaBuscada = await functions.buscarPersona(params)
+      if (!personaBuscada) {
+        await session.abortTransaction();
+        return res.status(500).send({
+          error: true,
+          message: 'La persona no existe en el sistema'
+        })
+      }
 
-      //asigno historia clinica a persona
-      await persona.updateOne(
-        {
-          documento: params.documento,
-          tipo_documento: params.tipo_documento,
-          sexo: params.sexo,
-          apellido: params.apellido
-        },
-        { historia_clinica: histID },
-        { session: session });
-      //termino la transaccion 
-      await session.commitTransaction();
-      console.log("Historia clinica creada y guardada con exito :D")
+      if (personaBuscada.historia_clinica) {
+        await session.abortTransaction();
+        return res.status(500).send({
+          error: true,
+          message: 'La persona ya tiene historia clinica'
+        })
+      } else {
+
+        const historicasClinicas = await historia_clinica.create([params], { session: session });
+        hist_clinica = historicasClinicas[0];
+        const histID = hist_clinica._id;
+        console.log("La nueva historia clìnica es: " + histID);
+
+        //asigno historia clinica a persona
+        await persona.updateOne(
+          {
+            documento: params.documento,
+            tipo_documento: params.tipo_documento,
+            sexo: params.sexo,
+            apellido: params.apellido
+          },
+          { historia_clinica: histID },
+          { session: session });
+        //termino la transaccion 
+        await session.commitTransaction();
+        console.log("Historia clinica creada y guardada con exito :D")
+      }
     } catch (err) {
       await session.abortTransaction();
       console.error("Error en la operacion: " + err);
@@ -212,36 +230,36 @@ var controller = {
             "diagnosticos_tratamiento.consulta": 0,
             "diagnosticos_tratamiento.enfermedad": 0,
             "diagnosticos_tratamiento.__v": 0,
-            "medicos._id":0,
-            "medicos.especialidades":0,
-            "medicos.persona":0,
-            "medicos.__v":0,
-            "datosPersonalesMedicoQueAtendioConsulta._id":0,
-            "datosPersonalesMedicoQueAtendioConsulta.historia_clinica":0,
-            "datosPersonalesMedicoQueAtendioConsulta.__v":0,
-            "medicosDeTratamientosFarmacologicos._id":0,
-            "medicosDeTratamientosFarmacologicos.historia_clinica":0,
-            "medicosDeTratamientosFarmacologicos.__v":0,
-            "datosPersonalesMedicoQueRecetoTratamientoFarmacologico._id":0,
-            "datosPersonalesMedicoQueRecetoTratamientoFarmacologico.historia_clinica":0,
-            "datosPersonalesMedicoQueRecetoTratamientoFarmacologico.__v":0,
-            "dosificacionesTratamientosFarmacologicos._id":0,
-            "dosificacionesTratamientosFarmacologicos.medicamento":0,
-            "dosificacionesTratamientosFarmacologicos.__v":0,
-            "medicamentoDosificacion._id":0,
-            "medicamentoDosificacion.__v":0,
+            "medicos._id": 0,
+            "medicos.especialidades": 0,
+            "medicos.persona": 0,
+            "medicos.__v": 0,
+            "datosPersonalesMedicoQueAtendioConsulta._id": 0,
+            "datosPersonalesMedicoQueAtendioConsulta.historia_clinica": 0,
+            "datosPersonalesMedicoQueAtendioConsulta.__v": 0,
+            "medicosDeTratamientosFarmacologicos._id": 0,
+            "medicosDeTratamientosFarmacologicos.historia_clinica": 0,
+            "medicosDeTratamientosFarmacologicos.__v": 0,
+            "datosPersonalesMedicoQueRecetoTratamientoFarmacologico._id": 0,
+            "datosPersonalesMedicoQueRecetoTratamientoFarmacologico.historia_clinica": 0,
+            "datosPersonalesMedicoQueRecetoTratamientoFarmacologico.__v": 0,
+            "dosificacionesTratamientosFarmacologicos._id": 0,
+            "dosificacionesTratamientosFarmacologicos.medicamento": 0,
+            "dosificacionesTratamientosFarmacologicos.__v": 0,
+            "medicamentoDosificacion._id": 0,
+            "medicamentoDosificacion.__v": 0,
           }
         }
       ])
       //console.log(resultado[0].medicos)
-      
-      const datosMedicosFinal = resultado[0].medicos.map((medico, index)=>{
+
+      const datosMedicosFinal = resultado[0].medicos.map((medico, index) => {
         return {
           datosMedico: medico,
           datosPersonales: resultado[0].datosPersonalesMedicoQueAtendioConsulta[index],
         }
       })
-      
+
       //console.log(datosMedicosFinal)
       //console.log('Resultado de la agregación:', resultado);
       return res.status(200).send(
