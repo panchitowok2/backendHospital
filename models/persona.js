@@ -4,7 +4,7 @@ import validator from 'validator'
 import historia_clinica from './historia_clinica.js'
 
 let esquemaPersona = new mongoose.Schema({
-    tipo_documento:{type:String, required:true, enum:['DNI','Libreta']},
+    tipo_documento:{type:String, required:true, enum:['DNI','LI', 'LE']},
     documento: {type: Number, required: true},
     nombre: {type: String, required: true},
     apellido: {type: String, required: true},
@@ -39,5 +39,7 @@ let esquemaPersona = new mongoose.Schema({
 }, {
   collection: 'persona' // Nombre personalizado para la colección
 })
+
+esquemaPersona.index({tipo_documento: 1, documento: 1, apellido: 1, sexo: 1}, {unique: true});
   
 export default mongoose.model('persona', esquemaPersona)
