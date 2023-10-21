@@ -11,6 +11,17 @@ const router = express.Router()
 * Es decir que si una consulta esta cargada en la Historia Clinica es porque el Turno apunta al mismo Paciente al que pertenece la Historia Clinica
 */
 
+/* Verificar que el usuario haya ingresado dosificaciones */
+const verificarDosificaciones = async (req, res, next) => {
+    const params = req.body;
+
+    if (!params.dosificaciones || !Array.isArray(params.dosificaciones)) {
+        return res.status(400).json({ message: 'El campo "dosificaciones" debe ser un array' });
+    }
+    
+    next();
+};
+
 const existeHistoriaClinica = async (req, res, next) => {
     const params = req.body;
 
@@ -18,12 +29,15 @@ const existeHistoriaClinica = async (req, res, next) => {
         const historia_clinica = await HistoriaClinica.findOne({ _id: params.historia_clinica })
 
         if (! historia_clinica) {
-            return res.status(404).json({ error: 'La Historia Clinica no existe en la base de datos' });
+            return res.status(404).json({ message: 'La Historia Clinica no existe en la base de datos' });
         }
 
         next();
-    } catch (error) {
-        return res.status(500).json({ error: 'Error en la consulta de Historia Clinica' });
+    } catch (err) {
+        return res.status(500).json({ 
+            message: 'Error al verificar si existe la Historia Clinica',
+            errors: err.errors
+        });
     }
 };
 
@@ -34,12 +48,15 @@ const existeDiagnostico = async (req, res, next) => {
         const diagnostico = await Diagnostico.findOne({ _id: params.diagnostico })
 
         if (! diagnostico) {
-            return res.status(404).json({ error: 'El Diagnostico no existe en la base de datos' });
+            return res.status(404).json({ message: 'El Diagnostico no existe en la base de datos' });
         }
 
         next();
-    } catch (error) {
-        return res.status(500).json({ error: 'Error en la consulta de diagnóstico' });
+    } catch (err) {
+        return res.status(500).json({ 
+            message: 'Error en la consulta de diagnóstico',
+            errors: err.errors
+        });
     }
 };
 
@@ -115,6 +132,6 @@ const verificarMedicoDelDiagnostico = async (req, res, next) => {
 
 
 // Ruta para obtener datos de persona
-router.post('/altaTratamientoFarmacologico', existeHistoriaClinica, existeDiagnostico, verificarConsultaDelDiagnostico, verificarDiagnosticoEnHistoriaClinica, verificarMedicoDelDiagnostico, controlador_tratamientos_farmacologicos.altaTratamientoFarmacologico)
+router.post('/altaTratamientoFarmacologico', verificarDosificaciones, existeHistoriaClinica, existeDiagnostico, verificarConsultaDelDiagnostico, verificarDiagnosticoEnHistoriaClinica, verificarMedicoDelDiagnostico, controlador_tratamientos_farmacologicos.altaTratamientoFarmacologico)
 
 export default router

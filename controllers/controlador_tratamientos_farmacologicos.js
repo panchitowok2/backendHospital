@@ -11,39 +11,46 @@ var controller = {
   * historia_clinica es un ObjectId valido
   * dosificaciones es un array y no esta vacio
   */
-  altaTratamientoFarmacologico: async (req, res) => 
-  {
+  altaTratamientoFarmacologico: async (req, res) => {
     var params = req.body
 
     const session = await mongoose.startSession();
-    var tratamiento = null
+    var dosificaciones = []
+    var nuevoTratamientoFarmacologico = null
 
-    try 
-    {
+    try {
       // Inicia la transacción
-      session.startTransaction();
-
-      const tratamientos = await TratamientoFarmacologico.create([params], { session: session });
-      tratamiento = tratamientos[0];
-      const tratamientoId = tratamiento._id;
-      console.log("El nuevo tratamiento es " + tratamientoId);
-
-
-      await HistoriaClinica.updateOne(
-        { _id: params.historia_clinica },
-        { $push: { tratamientos_farmacologicos: tratamientoId } },
-        { session: session }
-      );
+      await session.startTransaction();
 
       for (const dosificacion of params.dosificaciones) {
         const nuevaDosificacion = new Dosificacion({
           dosis: dosificacion.dosis,
           medicamento: dosificacion.medicamento
         });
-            
+
         // Guardar la dosificación en la base de datos
         await nuevaDosificacion.save({ session });
+        dosificaciones.push(nuevaDosificacion._id);
       }
+
+      nuevoTratamientoFarmacologico = new TratamientoFarmacologico({
+        "descripcion": params.descripcion,
+        "fecha_inicio": params.fecha_inicio,
+        "duracion": params.duracion,
+        "diagnostico": params.diagnostico,
+        "medico": params.medico,
+        "dosificaciones": dosificaciones
+      });
+
+      await nuevoTratamientoFarmacologico.save({ session });
+
+      const tratamientoId = nuevoTratamientoFarmacologico._id;
+
+      await HistoriaClinica.updateOne(
+        { _id: params.historia_clinica },
+        { $push: { tratamientos_farmacologicos: tratamientoId } },
+        { session: session }
+      );
 
       await session.commitTransaction();
 
@@ -52,22 +59,19 @@ var controller = {
     } catch (err) {
       await session.abortTransaction();
 
-      console.error('Error en la operación:' +err);
+      console.error('Error en la operación:' + err);
 
       return res.status(500).send({
-          status: 'Error',
-          message: 'Ha ocurrido un error en la operación'
-        });
-      }
+        "message": 'Ha ocurrido un error al ejecutar la transacción', 
+        "errors": err.errors
+      });
+    }
 
-      session.endSession();
+    session.endSession();
 
-      return res.status(200).send({
-        status: 'Success',
-        tratamiento,
-      })
+    return res.status(200).send(nuevoTratamientoFarmacologico)
   },
-     
+
 }
 
 export default controller
