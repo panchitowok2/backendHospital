@@ -33,6 +33,8 @@ app.use("/api",ruta_turno)
 app.use("/api",ruta_consulta)
 app.use("/api",ruta_diagnostico)
 app.use("/api",ruta_historia_clinica)
+app.use("/api", ruta_medicamento)
+app.use("/api", ruta_tratamiento_farmacologico)
 
 // Conexion a la base de datos
 mongoose.connect(url).then(() => {
