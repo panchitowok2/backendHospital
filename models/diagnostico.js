@@ -9,7 +9,7 @@ let esquemaDiagnostico = new mongoose.Schema({
     consulta: {
         type:mongoose.Schema.Types.ObjectId,
         ref: "consulta",
-        required: true
+        required: true 
     },
     enfermedad: {
         type:mongoose.Schema.Types.ObjectId,

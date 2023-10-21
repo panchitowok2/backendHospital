@@ -5,7 +5,6 @@ import persona from "./persona.js"
 
 // Crear el esquema de la base de datos
 let esquemaTratamientoFarmacologico = new mongoose.Schema({
-    //tipo: {type: String, required: true},
     descripcion: {type: String, required: true},
     fecha_inicio: {type: Date, required: true},
     duracion: {type: String, required: true},

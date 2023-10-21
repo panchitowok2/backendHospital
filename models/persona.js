@@ -26,7 +26,16 @@ let esquemaPersona = new mongoose.Schema({
       ref:"historia_clinica",
       required: false
     },
-  sexo:{type:String, required:true}
+    sexo: {
+      type: String,
+      required: true,
+      validate: {
+        validator: function(value) {
+          return ['M', 'F'].includes(value);
+        },
+        message: 'El campo sexo debe ser "M" o "F"'
+      }
+    }
 }, {
   collection: 'persona' // Nombre personalizado para la colección
 })

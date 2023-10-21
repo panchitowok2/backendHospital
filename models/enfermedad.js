@@ -5,7 +5,7 @@ let esquemaEnfermedad = new mongoose.Schema({
     nombre: {type: String, required: true},
     tipo: {type: String, required: true}
 }, {
-    collection: 'enfermedad' // Nombre personalizado para la colección
-  })
+  collection: 'enfermedad' // Nombre personalizado para la colección
+})
 
 export default mongoose.model('enfermedad', esquemaEnfermedad)
