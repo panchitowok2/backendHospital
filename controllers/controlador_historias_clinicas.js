@@ -35,7 +35,7 @@ var controller = {
       return res.status(200).send({
         grupo_sanguineo: historiaClinicaBuscada.grupo_sanguineo,
         factor_sanguineo: historiaClinicaBuscada.factor_sanguineo,
-        tratamiento_farmacologico: historiaClinicaBuscada.tratamiento_farmacologico,
+        tratamiento_farmacologico: historiaClinicaBuscada.tratamientos_farmacologicos,
         consultas: historiaClinicaBuscada.consultas,
         diagnosticos: historiaClinicaBuscada.diagnosticos,
       })
