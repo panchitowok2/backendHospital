@@ -80,6 +80,9 @@ var controller = {
           }
         },
         {
+          $unwind: "$medicamento"
+        },
+        {
           "$group": {
             _id: "$medicamento",
             count: {
@@ -93,8 +96,12 @@ var controller = {
         {
           $project: {
             _id: 0, // Elimina el campo _id de la salida
-            medicamento: 1, // Conserva el campo medicamento
-            count: 1 // Conserva el campo count
+            //medicamento: 1, // Conserva el campo medicamento
+            count: 1, // Conserva el campo count
+            "medicamento.droga": 1,
+            "medicamento.nombre": 1,
+            "medicamento.presentacion": 1,
+            "medicamento._id": 1
           }
         }
       ])
