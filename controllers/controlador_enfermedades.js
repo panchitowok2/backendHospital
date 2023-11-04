@@ -4,10 +4,12 @@ import mongoose from "mongoose";
 var controller_enfermedad = {
   obtener_enfermedades: async () => {
     try {
+      
       const enfermedades = await Enfermedad.find({})
       if (!enfermedades) {
         return null;
       }
+     
       return enfermedades
     } catch (error) {
       throw new Error('No ha sido posible buscar las enfermedades');
@@ -15,7 +17,8 @@ var controller_enfermedad = {
   },
   obtener_info_enfermedad: async (req, res) => {
     try {
-      const enfermedades_info = await obtener_enfermedades();
+     
+      const enfermedades_info = await controller_enfermedad.obtener_enfermedades();
       if (!enfermedades_info) {
         return res.status(404).send({
           error: true,

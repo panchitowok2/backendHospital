@@ -14,6 +14,7 @@ import ruta_turno from "./routes/ruta_turno.js"
 import ruta_consulta from "./routes/ruta_consulta.js"
 import ruta_diagnostico from "./routes/ruta_diagnostico.js"
 import ruta_historia_clinica from "./routes/ruta_historia_clinica.js"
+import ruta_enfermedades from "./routes/ruta_enfermedades.js"
 const app = express()
 
 // Creamos el servidor con el modulo http por defecto en NodeJS
@@ -21,7 +22,7 @@ const server = http.createServer(app)
 
 // Vemos las peticiones por consola utilizando el paquete morgan en modo dev
 app.use(morgan('dev'))
-
+app.use(cors());
 // Middleware para analizar cuerpos de a través de la URL
 app.use(bodyParser.urlencoded({ extended: false }))
 // Cualquier tipo de petición lo convertimos a json
@@ -35,6 +36,7 @@ app.use("/api",ruta_diagnostico)
 app.use("/api",ruta_historia_clinica)
 app.use("/api", ruta_medicamento)
 app.use("/api", ruta_tratamiento_farmacologico)
+app.use("/api",ruta_enfermedades)
 
 // Conexion a la base de datos
 mongoose.connect(url).then(() => {
