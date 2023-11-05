@@ -4,7 +4,7 @@ import TratamientoFarmacologico from '../models/tratamiento_farmacologico.js'
 var controller = {
   /* Funcion para buscar medicamentos mas recetados
   * 
-  *   select medicamento.id, medicamento.nombre, count(*)
+  *  select medicamento.id, medicamento.nombre, count(*)
   *  from tratamiento_farmacologico
   *  inner join medico on tratamiento_farmacologico.medico_id = medico .id
   *  inner join especialidad on medico.especialidad_id = especialidad.id
