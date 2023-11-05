@@ -8,6 +8,7 @@ var controller = {
     const especialidades = await Especialidad.find({
       nombre: { $regex: new RegExp(filter, "i")}, // el parametro "i" lo hace case-insensitive 
     }).select("_id nombre")
+    .sort({ nombre: 1 }); // 1 para orden ascendente
     
     if (especialidades.length === 0) {
       return res.status(404).send({

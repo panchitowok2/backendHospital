@@ -38,6 +38,7 @@ const verificarEspecialidad = async (req, res, next) => {
 };
 
 // Ruta para obtener datos de persona
+router.post('/obtenerMedicamentos', controlador_medicamentos.obtenerMedicamentos)
 router.get('/buscarMedicamentosMasRecetados', validarRequestMedicamentos, verificarEspecialidad, controlador_medicamentos.buscarMedicamentosMasRecetados)
 
 export default router

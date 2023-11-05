@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import TratamientoFarmacologico from '../models/tratamiento_farmacologico.js'
+import Medicamento from '../models/medicamento.js'
 
 var controller = {
   /* Funcion para buscar medicamentos mas recetados
@@ -108,6 +109,25 @@ var controller = {
     
       return res.status(200).send(resultado);
     },  
+    obtenerMedicamentos: async (req, res) => {
+      const { filter } = req.body;
+  
+      const medicamentos = await Medicamento.find({
+        $or: [
+          { nombre: { $regex: new RegExp(filter, "i") } },
+          { droga: { $regex: new RegExp(filter, "i") } }
+        ]
+      }).select("_id nombre droga presentacion")
+      .sort({ nombre: 1 }); // 1 para orden ascendente
+      
+      if (medicamentos.length === 0) {
+        return res.status(404).send({
+          message: "No se encontraron medicamentos que coincidan con el filtro proporcionado"
+        })
+      }
+  
+      return res.status(200).send(medicamentos)
+    },
 }
 
 export default controller

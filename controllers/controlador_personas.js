@@ -4,7 +4,6 @@ import functions from './functions/functions_personas.js'
 import mongoose from 'mongoose';
 
 var controller = {
-  // Funcion para guardar los mensajes
   buscarPersona: async (req, res) => {
     var params = req.body
 
