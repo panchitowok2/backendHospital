@@ -104,6 +104,11 @@ var controller = {
             "medicamento.presentacion": 1,
             "medicamento._id": 1
           }
+        },
+        {
+          $sort: {
+            count: -1 // Ordenar de manera descendente por el campo "count"
+          }
         }
       ])
     
