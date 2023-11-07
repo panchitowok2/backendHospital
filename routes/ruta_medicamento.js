@@ -9,7 +9,7 @@ const router = express.Router()
 const validarRequestMedicamentos = (req, res, next) => {
     // Comprueba si el usuario envio todos los parametros necesarios
     if (!req.body.fecha_inicio || !req.body.fecha_final || !req.body.especialidad) {
-      return res.status(500).json({ message: 'Las propiedades "fecha_inicio", "fecha_final" y "especialidad" son requeridas' });
+      return res.status(400).json({ message: 'Las propiedades "fecha_inicio", "fecha_final" y "especialidad" son requeridas' });
     }
 
     const fechaInicio = new Date(req.body.fecha_inicio);
@@ -17,7 +17,7 @@ const validarRequestMedicamentos = (req, res, next) => {
 
     // Verifica si las fechas son válidas
     if (isNaN(fechaInicio.getTime()) || isNaN(fechaFinal.getTime())) {
-        return res.status(500).json({ message: 'Las fechas proporcionadas no son válidas' });
+        return res.status(400).json({ message: 'Las fechas proporcionadas no son válidas' });
     }
 
     // Aceptar la solicitud
