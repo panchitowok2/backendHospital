@@ -77,11 +77,14 @@ const verificarConsultaDelDiagnostico = async (req, res, next) => {
         });
 
         if (! consultaEncontrada)
-            return res.status(404).json({ error: 'La consulta no se encuentra cargada en la Historia Clinica' });
+            return res.status(404).json({ message: 'La consulta no se encuentra cargada en la Historia Clinica' });
 
         next();
-    } catch (error) {
-        return res.status(500).json({ error: 'Error en la consulta de diagnóstico' });
+    } catch (err) {
+        return res.status(500).json({ 
+            message: 'Error en la consulta de diagnóstico',
+            errors: err.errors 
+        });
     }
 };
 
@@ -105,8 +108,11 @@ const verificarDiagnosticoEnHistoriaClinica = async (req, res, next) => {
             return res.status(404).json({ error: 'El diagnostico no se encuentra cargado en la Historia Clinica' });
 
         next();
-    } catch (error) {
-        return res.status(500).json({ error: 'Error en la consulta de diagnóstico' });
+    } catch (err) {
+        return res.status(500).json({ 
+            message: 'Error en la consulta de diagnóstico',
+            errors: err.errors 
+        });
     }
 };
 
@@ -125,8 +131,11 @@ const verificarMedicoDelDiagnostico = async (req, res, next) => {
         
         // Aceptar la solicitud
         next();
-    } catch (error) {
-        return res.status(500).json({ error: 'Error en la consulta de diagnóstico' });
+    } catch (err) {
+        return res.status(500).json({ 
+            message: 'Error en la consulta de diagnóstico',
+            errors: err.errors 
+        });
     }
 };
 
