@@ -1,17 +1,11 @@
 import historia_clinica from '../models/historia_clinica.js';
 import persona from '../models/persona.js'
 import mongoose from 'mongoose';
-import controladorPersona from './controlador_personas.js';
 import functions from './functions/functions_personas.js'
-import functionsConsulta from './functions/functions_consultas.js'
-import functionsTratamiento from './functions/functions_tratamientosFarmacologicos.js'
-import functionsDiagnostico from './functions/functions_diagnosticos.js';
-import functionsMedico from './functions/functions_medico.js';
-import functionsDosificacion from './functions/functions_dosificacion.js';
 
 var controller = {
-  //buscar historia clinica segun datos de paciente
-  buscarHistoriaClinica: async (req, res) => {
+  //buscar id historia clinica segun datos de paciente
+  buscarIdHistoriaClinica: async (req, res) => {
     var params = req.body
 
     var personaBuscada = await functions.buscarPersona(params)
@@ -33,12 +27,31 @@ var controller = {
       }
       //si la historia clinica fue encontrada devolvemos esto
       return res.status(200).send({
-        grupo_sanguineo: historiaClinicaBuscada.grupo_sanguineo,
-        factor_sanguineo: historiaClinicaBuscada.factor_sanguineo,
-        tratamiento_farmacologico: historiaClinicaBuscada.tratamientos_farmacologicos,
-        consultas: historiaClinicaBuscada.consultas,
-        diagnosticos: historiaClinicaBuscada.diagnosticos,
+        id: historiaClinicaBuscada._id,
       })
+    }).catch(error => {
+      return res.status(500).send({
+        error: true,
+        message: 'No ha sido posible buscar la historia clinica' + error
+      })
+    })
+  },
+  //Buscar datos de historia clinica segun un id
+  buscarDatosHistoriaClinica: async (req, res) => {
+    var params = req.body
+
+    await historia_clinica.findOne({
+      _id: params._id
+    }).then(historiaClinicaBuscada => {
+      //si la historia clinica no pude ser encontrada devuelve este error    
+      if (!historiaClinicaBuscada) {
+        return res.status(404).send({
+          error: true,
+          message: 'No existe la historia clinica'
+        })
+      }
+      //si la historia clinica fue encontrada devolvemos esto
+      return res.status(200).send(historiaClinicaBuscada)
     }).catch(error => {
       return res.status(500).send({
         error: true,

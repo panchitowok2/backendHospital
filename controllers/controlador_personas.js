@@ -4,7 +4,7 @@ import functions from './functions/functions_personas.js'
 import mongoose from 'mongoose';
 
 var controller = {
-  buscarPersona: async (req, res) => {
+  buscarIdPersona: async (req, res) => {
     var params = req.body
 
     const resultado = await functions.buscarPersona(params)
@@ -14,7 +14,42 @@ var controller = {
         message: 'No existe la persona'
       })
     }
+    return res.status(200).send(resultado._id)
+
+    //console.log(resultado)
+  },
+  buscarDatosPersona: async (req, res) => {
+    var params = req.body
+
+    const resultado = await functions.buscarPersonaPorId(params)
+    if (!resultado) {
+      return res.status(404).send({
+        error: true,
+        message: 'No existe la persona'
+      })
+    }
     return res.status(200).send(resultado)
+
+    //console.log(resultado)
+  },
+  buscarIdHistoriaClinicaSegunIdPersona: async (req, res) => {
+    var params = req.body
+
+    const resultado = await functions.buscarPersonaPorId(params)
+    if (!resultado) {
+      return res.status(404).send({
+        error: true,
+        message: 'No existe la persona'
+      })
+    }
+    if (resultado.historia_clinica == null) {
+      return res.status(404).send({
+        error: true,
+        message: 'La persona no tiene historia clinica asociada.'
+      })
+    } else {
+      return res.status(200).send(resultado.historia_clinica)
+    }
 
     //console.log(resultado)
   },

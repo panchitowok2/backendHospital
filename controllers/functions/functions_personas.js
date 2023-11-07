@@ -20,6 +20,23 @@ const functions = {
             return null;
         })
         return resultado;
+    },
+    buscarPersonaPorId: async (params) => {
+        const resultado = await Persona.findOne({
+            _id: params._id
+        }).then(personaBuscada => {
+            //si la persona no pude ser encontrada devuelve este error    
+            //console.log('la funcion devuelve: ', personaBuscada)
+            if (!personaBuscada) {
+                //console.log('entro al if')
+                return null;
+            } 
+            //si la persona fue encontrada devolvemos esto
+            return personaBuscada
+        }).catch(error => {
+            return null;
+        })
+        return resultado;
     }
 }
 export default functions;
