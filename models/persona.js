@@ -24,7 +24,8 @@ let esquemaPersona = new mongoose.Schema({
     historia_clinica:{
       type:mongoose.Schema.Types.ObjectId,
       ref:"historia_clinica",
-      required: false
+      required: false,
+      default: null,
     },
     sexo: {
       type: String,
