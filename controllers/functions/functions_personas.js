@@ -14,6 +14,7 @@ const functions = {
                 //console.log('entro al if')
                 return null;
             }
+
             //si la persona fue encontrada devolvemos esto
             return personaBuscada
         }).catch(error => {

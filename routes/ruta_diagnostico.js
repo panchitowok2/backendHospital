@@ -5,4 +5,6 @@ const router = express.Router()
 router.post('/alta_diagnostico_completo', controlador_diagnosticos.guardar_diagnostico)
 router.get("/obtener_diagnosticos_por_enfermedad",controlador_diagnosticos.obtener_diagnosticos_por_enfermedad)
 
+router.get('/obtenerDatosDiagnostico', controlador_diagnosticos.obtenerDatosDiagnostico)
+
 export default router

@@ -1,9 +1,6 @@
 
-import Consulta from "../models/consulta.js";
 import Diagnostico from "../models/diagnostico.js";
-import enfermedad from "../models/enfermedad.js";
 import Historia_clinica from "../models/historia_clinica.js";
-import medicamento from "../models/medicamento.js";
 import controlador_consulta from "./controlador_consultas.js";
 import mongoose from "mongoose";
 
@@ -283,6 +280,22 @@ var controller_diagnostico = {
       return resultado_final;
     } catch (error) {
 
+    }
+  },
+  obtenerDatosDiagnostico: async (req, res) => {
+    try {
+        const diagnosticoId = req.query.id; 
+
+        const diagnostico = await Diagnostico.findOne({ _id: diagnosticoId });
+
+        if (!diagnostico) {
+            return res.status(404).json({ message: 'Diagnóstico no encontrado' });
+        }
+
+        return res.status(200).json(diagnostico);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Error interno del servidor' });
     }
   }
 
