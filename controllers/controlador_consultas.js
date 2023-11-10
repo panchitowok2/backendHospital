@@ -108,7 +108,7 @@ var controller_consulta = {
     try {
         const consultaId = req.params.id; 
 
-        const consulta = await Enfermedad.findOne({ _id: consultaId });
+        const consulta = await Consulta.findOne({ _id: consultaId });
 
         if (! consulta) {
             return res.status(404).json({ message: 'Consulta no encontrada' });
