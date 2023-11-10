@@ -11,7 +11,6 @@ var controller_medico = {
 
       if (!medicos) {
         return null;
-
       }
     
       const medicos_info = medicos.map(medico => ({
@@ -21,6 +20,7 @@ var controller_medico = {
         nombre: medico.persona.nombre,
         apellido: medico.persona.apellido,
       }));
+
       return medicos_info;
     } catch (error) {
       throw new Error('No ha sido posible buscar los médicos');
@@ -47,6 +47,30 @@ var controller_medico = {
     }
 
   },
+  getById: async (req, res) => {
+    try {
+        const medicoId = req.params.id; 
+
+        const medico = await Medico.findOne({ _id: medicoId }).populate("persona");
+
+        if (! medico) {
+            return res.status(404).json({ message: 'Medico no encontrado' });
+        }
+
+        return res.status(200).json({
+          _id: medico._id,
+          legajo: medico.legajo,
+          especialidades: medico.especialidades,
+          nombre: medico.persona.nombre,
+          apellido: medico.persona.apellido,
+        });
+    } catch (err) {
+        return res.status(500).json({ 
+          message: 'Error interno del servidor',
+          errors: err.errors
+        });
+    }
+  }
 
 
 }
