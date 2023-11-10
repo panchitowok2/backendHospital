@@ -103,7 +103,26 @@ var controller_consulta = {
         message: "error al guardar consulta por motivos externos"
       })
     }
+  },
+  getById: async (req, res) => {
+    try {
+        const consultaId = req.params.id; 
+
+        const consulta = await Enfermedad.findOne({ _id: consultaId });
+
+        if (! consulta) {
+            return res.status(404).json({ message: 'Consulta no encontrada' });
+        }
+
+        return res.status(200).json(consulta);
+    } catch (err) {
+        return res.status(500).json({ 
+          message: 'Error interno del servidor',
+          errors: err.errors
+        });
+    }
   }
+
 }
 
 export default controller_consulta

@@ -282,9 +282,9 @@ var controller_diagnostico = {
 
     }
   },
-  obtenerDatosDiagnostico: async (req, res) => {
+  getById: async (req, res) => {
     try {
-        const diagnosticoId = req.query.id; 
+        const diagnosticoId = req.params.id; 
 
         const diagnostico = await Diagnostico.findOne({ _id: diagnosticoId });
 

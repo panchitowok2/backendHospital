@@ -204,7 +204,7 @@ const existenTratamientosEnEsaFechaConDosificaciones = async (req, res, next) =>
 
 
 // Ruta para obtener datos de persona
-router.post('/obtenerMedicamentos', controlador_medicamentos.obtenerMedicamentos)
-router.post('/buscarMedicamentosMasRecetados', validarRequestMedicamentos, verificarEspecialidad, existenTratamientosEnEsaFecha, existenTratamientosRealizadosPorMedicosConEsaEspecialidad, existenTratamientosEnEsaFechaConDosificaciones, controlador_medicamentos.buscarMedicamentosMasRecetados)
+router.post('/medicamentos', controlador_medicamentos.all)
+router.post('/medicamentos/buscarMedicamentosMasRecetados', validarRequestMedicamentos, verificarEspecialidad, existenTratamientosEnEsaFecha, existenTratamientosRealizadosPorMedicosConEsaEspecialidad, existenTratamientosEnEsaFechaConDosificaciones, controlador_medicamentos.buscarMedicamentosMasRecetados)
 
 export default router

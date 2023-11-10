@@ -32,6 +32,24 @@ var controller_enfermedad = {
         message: "error al buscar las enfermedades"
       });
     }
+  },
+  getById: async (req, res) => {
+    try {
+        const enfermedadId = req.params.id; 
+
+        const enfermedad = await Enfermedad.findOne({ _id: enfermedadId });
+
+        if (!enfermedad) {
+            return res.status(404).json({ message: 'Enfermedad no encontrada' });
+        }
+
+        return res.status(200).json(enfermedad);
+    } catch (err) {
+        return res.status(500).json({ 
+          message: 'Error interno del servidor',
+          errors: err.errors
+        });
+    }
   }
 }
 export default controller_enfermedad

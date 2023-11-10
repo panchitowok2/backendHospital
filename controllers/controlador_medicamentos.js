@@ -114,7 +114,7 @@ var controller = {
     
       return res.status(200).send(resultado);
     },  
-    obtenerMedicamentos: async (req, res) => {
+    all: async (req, res) => {
       const { filter } = req.body;
   
       const medicamentos = await Medicamento.find({
