@@ -18,6 +18,24 @@ var controller = {
 
     return res.status(200).send(especialidades)
   },
+  getById: async (req, res) => {
+    try {
+        const especialidadId = req.params.id; 
+
+        const especialidad = await Especialidad.findOne({ _id: especialidadId });
+
+        if (! especialidad) {
+            return res.status(404).json({ message: 'Especialidad no encontrada' });
+        }
+
+        return res.status(200).json(especialidad);
+    } catch (err) {
+        return res.status(500).json({ 
+          message: 'Error interno del servidor',
+          errors: err.errors
+        });
+    }
+  }
 
 }
 
