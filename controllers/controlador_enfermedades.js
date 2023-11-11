@@ -5,7 +5,8 @@ var controller_enfermedad = {
   obtener_enfermedades: async () => {
     try {
       
-      const enfermedades = await Enfermedad.find({})
+      const enfermedades = await Enfermedad.find({}).select("_id nombre")
+      .sort({ nombre: 1 })
       if (!enfermedades) {
         return null;
       }
