@@ -115,24 +115,36 @@ var controller = {
       return res.status(200).send(resultado);
     },  
     all: async (req, res) => {
-      const { filter } = req.body;
-  
-      const medicamentos = await Medicamento.find({
-        $or: [
-          { nombre: { $regex: new RegExp(filter, "i") } },
-          { droga: { $regex: new RegExp(filter, "i") } }
-        ]
-      }).select("_id nombre droga presentacion")
+      const medicamentos = await Medicamento.find({ })
+      .select("_id nombre droga presentacion")
       .sort({ nombre: 1 }); // 1 para orden ascendente
       
       if (medicamentos.length === 0) {
         return res.status(404).send({
-          message: "No se encontraron medicamentos que coincidan con el filtro proporcionado"
+          message: "No se encontraron medicamentos"
         })
       }
   
       return res.status(200).send(medicamentos)
     },
+    getById: async (req, res) => {
+      try {
+          const medicamentoId = req.params.id; 
+  
+          const medicamento = await Medicamento.findOne({ _id: medicamentoId });
+  
+          if (! medicamento) {
+              return res.status(404).json({ message: 'Medicamento no encontrada' });
+          }
+  
+          return res.status(200).json(medicamento);
+      } catch (err) {
+          return res.status(500).json({ 
+            message: 'Error interno del servidor',
+            errors: err.errors
+          });
+      }
+    }
 }
 
 export default controller
