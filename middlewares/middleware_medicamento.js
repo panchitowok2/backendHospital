@@ -3,39 +3,44 @@ import TratamientoFarmacologico from '../models/tratamiento_farmacologico.js'
 import mongoose from 'mongoose'
 
 const validarRequestMedicamentos = (req, res, next) => {
-    // Comprueba si el usuario envio todos los parametros necesarios
-    if (!req.body.fecha_inicio || !req.body.fecha_final || !req.body.especialidad) {
-      return res.status(400).json({ message: 'Las propiedades "fecha_inicio", "fecha_final" y "especialidad" son requeridas' });
-    }
+  // Comprueba si el usuario envió todos los parámetros necesarios
+  if (!req.body.fecha_inicio || !req.body.fecha_final || !req.body.especialidad) {
+    return res.status(400).json({ message: 'Las propiedades "fecha_inicio", "fecha_final" y "especialidad" son requeridas' });
+  }
 
-    const fechaInicio = new Date(req.body.fecha_inicio);
-    const fechaFinal = new Date(req.body.fecha_final);
+  const fechaInicio = new Date(req.body.fecha_inicio);
+  const fechaFinal = new Date(req.body.fecha_final);
 
-    // Verifica si las fechas son válidas
-    if (isNaN(fechaInicio.getTime()) || isNaN(fechaFinal.getTime())) {
-        return res.status(400).json({ message: 'Las fechas proporcionadas no son válidas' });
+  // Verifica si las fechas son válidas
+  if (isNaN(fechaInicio.getTime()) || isNaN(fechaFinal.getTime())) {
+    return res.status(400).json({ message: 'Las fechas proporcionadas no son válidas' });
+  }
+
+  // Verifica que fechaInicio sea anterior a fechaFinal
+  if (fechaInicio > fechaFinal) {
+    return res.status(400).json({ message: 'La fecha de inicio debe ser anterior a la fecha final' });
+  }
+
+  // Aceptar la solicitud
+  next();
+};
+
+const verificarEspecialidad = async (req, res, next) => {
+  try {
+    const especialidad = await Especialidad.findOne({ _id: req.body.especialidad }).exec();
+
+    if (!especialidad) {
+      return res.status(404).json({ message: 'Especialidad no encontrada' });
     }
 
     // Aceptar la solicitud
     next();
-};
-
-const verificarEspecialidad = async (req, res, next) => {
-    try {
-      const especialidad = await Especialidad.findOne({ _id: req.body.especialidad }).exec();
-      
-      if (!especialidad) {
-        return res.status(404).json({ message: 'Especialidad no encontrada' });
-      }
-     
-      // Aceptar la solicitud
-      next();
-    } catch (err) {
-      return res.status(500).json({ 
-        message: 'Error interno del servidor',
-        errors: err.errors
-      });
-    }
+  } catch (err) {
+    return res.status(500).json({
+      message: 'Error interno del servidor',
+      errors: err.errors
+    });
+  }
 };
 
 const existenTratamientosEnEsaFecha = async (req, res, next) => {
@@ -44,7 +49,7 @@ const existenTratamientosEnEsaFecha = async (req, res, next) => {
   const fechaFinal = new Date(params.fecha_final)
 
   try {
-    
+
     const tratamientos = await TratamientoFarmacologico.aggregate([
       {
         $match: {
@@ -59,11 +64,11 @@ const existenTratamientosEnEsaFecha = async (req, res, next) => {
     if (tratamientos.length === 0) {
       return res.status(404).json({ message: 'No existen tratamientos para el rango de fechas seleccionado' });
     }
-   
+
     // Aceptar la solicitud
     next();
   } catch (err) {
-    return res.status(500).json({ 
+    return res.status(500).json({
       message: 'Error interno del servidor',
       errors: err.errors
     });
@@ -77,7 +82,7 @@ const existenTratamientosRealizadosPorMedicosConEsaEspecialidad = async (req, re
   const especialidadId = new mongoose.Types.ObjectId(params.especialidad);
 
   try {
-    
+
     const tratamientos = await TratamientoFarmacologico.aggregate([
       {
         $match: {
@@ -116,11 +121,11 @@ const existenTratamientosRealizadosPorMedicosConEsaEspecialidad = async (req, re
     if (tratamientos.length === 0) {
       return res.status(404).json({ message: 'No existen tratamientos realizados por medicos con dicha especialidad en el rango de fechas seleccionado' });
     }
-   
+
     // Aceptar la solicitud
     next();
   } catch (err) {
-    return res.status(500).json({ 
+    return res.status(500).json({
       message: 'Error interno del servidor',
       errors: err.errors
     });
@@ -134,7 +139,7 @@ const existenTratamientosEnEsaFechaConDosificaciones = async (req, res, next) =>
   const especialidadId = new mongoose.Types.ObjectId(params.especialidad);
 
   try {
-    
+
     const tratamientos = await TratamientoFarmacologico.aggregate([
       {
         $match: {
@@ -179,28 +184,28 @@ const existenTratamientosEnEsaFechaConDosificaciones = async (req, res, next) =>
         }
       }
     ]);
-    
+
 
     if (tratamientos.length === 0) {
       return res.status(404).json({ message: 'No existen tratamientos con dosificaciones para el rango de fechas seleccionado' });
     }
 
     console.log(tratamientos)
-   
+
     // Aceptar la solicitud
     next();
   } catch (err) {
-    return res.status(500).json({ 
+    return res.status(500).json({
       message: 'Error interno del serviddor',
       errors: err.errors
     });
   }
 };
 
-export { 
-    validarRequestMedicamentos, 
-    verificarEspecialidad, 
-    existenTratamientosEnEsaFecha, 
-    existenTratamientosRealizadosPorMedicosConEsaEspecialidad, 
-    existenTratamientosEnEsaFechaConDosificaciones 
+export {
+  validarRequestMedicamentos,
+  verificarEspecialidad,
+  existenTratamientosEnEsaFecha,
+  existenTratamientosRealizadosPorMedicosConEsaEspecialidad,
+  existenTratamientosEnEsaFechaConDosificaciones
 }
