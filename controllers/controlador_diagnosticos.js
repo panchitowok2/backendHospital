@@ -68,6 +68,7 @@ var controller_diagnostico = {
   obtener_diagnosticos_por_enfermedad: async (req, res) => {
     try {
       let params = req.body
+
       const resultado = await controller_diagnostico.obtener_diagnosticos_por_enfermedadDB(params.id_enfermedad, new Date(params.fecha_inicio), new Date(params.fecha_fin))
       if (resultado == null) {
         return res.status(404).send({
@@ -244,7 +245,7 @@ var controller_diagnostico = {
         return{
         consulta: {
           id_consulta: resultado.consulta._id,
-          fecha_conculta: resultado.consulta.fecha_y_hora,
+          fecha_consulta: resultado.consulta.fecha_y_hora,
           sintomas: resultado.consulta.sintomas,
           observacion: resultado.consulta.observacion,
           medico_consulta: {
