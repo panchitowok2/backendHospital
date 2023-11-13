@@ -3,6 +3,7 @@ import Diagnostico from "../models/diagnostico.js";
 import Historia_clinica from "../models/historia_clinica.js";
 import controlador_consulta from "./controlador_consultas.js";
 import mongoose from "mongoose";
+import { format } from "date-fns";
 
 var controller_diagnostico = {
   guardar_diagnosticoDB: async (observacion, descripcion, id_consulta, id_enfermedad, id_historia_clinica) => {
@@ -222,6 +223,20 @@ var controller_diagnostico = {
               $ifNull: ["$medicamento", null],
             },
           },
+        }, {
+          $group: {
+            _id: "$_id",
+            observaciones: { $first: "$observaciones" },
+            consulta: { $first: "$consulta" },
+            enfermedad: { $first: "$enfermedad" },
+            turno: { $first: "$turno" },
+            paciente: { $first: "$paciente" },
+            medico: { $first: "$medico" },
+            datos_del_medico: { $first: "$datos_del_medico" },
+            tratamiento_farmacologico: { $first: "$tratamiento_farmacologico" },
+            dosificaciones: { $first: "$dosificaciones" },
+            medicamento: { $first: "$medicamento" }
+          },
         },
 
       ])
@@ -229,9 +244,9 @@ var controller_diagnostico = {
         return null;
 
       }
-      //return resultados
-    
-  
+      // return resultados
+
+
       const resultado_final = resultados.map(resultado => {
         const tratamiento_farmacologico = resultado.tratamiento_farmacologico ? {
           id_tratamiento: resultado.tratamiento_farmacologico._id,
@@ -239,43 +254,43 @@ var controller_diagnostico = {
           nombre_medicamento: resultado.medicamento.nombre,
           presentacion_medicamento: resultado.medicamento.presentacion,
           dosis: resultado.dosificaciones.dosis,
-          fecha_inicio: resultado.tratamiento_farmacologico.fecha_inicio,
+          fecha_inicio: format((new Date(resultado.tratamiento_farmacologico.fecha_inicio)), 'dd/MM/yyyy'),
           duracion: resultado.tratamiento_farmacologico.duracion,
         } : null;
-        return{
-        consulta: {
-          id_consulta: resultado.consulta._id,
-          fecha_consulta: resultado.consulta.fecha_y_hora,
-          sintomas: resultado.consulta.sintomas,
-          observacion: resultado.consulta.observacion,
-          medico_consulta: {
-            id_medico: resultado.medico._id,
-            legajo: resultado.medico.legajo,
-            nombre: resultado.datos_del_medico.nombre,
-            apellido: resultado.datos_del_medico.apellido,
+        return {
+          consulta: {
+            id_consulta: resultado.consulta._id,
+            fecha_consulta: format((new Date(resultado.consulta.fecha_y_hora)), 'dd/MM/yyyy HH:mm'),
+            sintomas: resultado.consulta.sintomas,
+            observacion: resultado.consulta.observacion,
+            medico_consulta: {
+              id_medico: resultado.medico._id,
+              legajo: resultado.medico.legajo,
+              nombre: resultado.datos_del_medico.nombre,
+              apellido: resultado.datos_del_medico.apellido,
 
-          },
-          paciente_consulta: {
-            id_paciente: resultado.paciente._id,
-            nombre: resultado.paciente.nombre,
-            apellido: resultado.paciente.apellido,
-            tipo_documento: resultado.paciente.tipo_documento,
-            documento: resultado.paciente.documento,
-            sexo: resultado.paciente.sexo,
-            direccion: resultado.paciente.direccion,
-            telefono: resultado.paciente.telefono,
+            },
+            paciente_consulta: {
+              id_paciente: resultado.paciente._id,
+              nombre: resultado.paciente.nombre,
+              apellido: resultado.paciente.apellido,
+              tipo_documento: resultado.paciente.tipo_documento,
+              documento: resultado.paciente.documento,
+              sexo: resultado.paciente.sexo,
+              direccion: resultado.paciente.direccion,
+              telefono: resultado.paciente.telefono,
 
-          },
-          diagnostico: {
-            _id: resultado._id,
-            observaciones: resultado.observaciones,
-            enfermedad: resultado.enfermedad.nombre,
-            tratamiento_farmacologico
+            },
+            diagnostico: {
+              _id: resultado._id,
+              observaciones: resultado.observaciones,
+              enfermedad: resultado.enfermedad.nombre,
+              tratamiento_farmacologico
 
 
-          },
+            },
+          }
         }
-      }
       })
       console.log(resultado_final);
       return resultado_final;
@@ -285,18 +300,18 @@ var controller_diagnostico = {
   },
   getById: async (req, res) => {
     try {
-        const diagnosticoId = req.params.id; 
+      const diagnosticoId = req.params.id;
 
-        const diagnostico = await Diagnostico.findOne({ _id: diagnosticoId });
+      const diagnostico = await Diagnostico.findOne({ _id: diagnosticoId });
 
-        if (!diagnostico) {
-            return res.status(404).json({ message: 'Diagnóstico no encontrado' });
-        }
+      if (!diagnostico) {
+        return res.status(404).json({ message: 'Diagnóstico no encontrado' });
+      }
 
-        return res.status(200).json(diagnostico);
+      return res.status(200).json(diagnostico);
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: 'Error interno del servidor' });
+      console.error(error);
+      return res.status(500).json({ message: 'Error interno del servidor' });
     }
   }
 
