@@ -69,20 +69,20 @@ var controller = {
       //inicio la transaccion
       session.startTransaction();
 
-      var personaBuscada = await functions.buscarPersona(params)
+      var personaBuscada = await functions.buscarPersonaPorId(params)
       if (!personaBuscada) {
         await session.abortTransaction();
-        return res.status(500).send({
+        return res.status(404).send({
           error: true,
-          message: 'La persona no existe en el sistema'
+          message: 'NOT FOUND: La persona no existe en el sistema'
         })
       }
 
       if (personaBuscada.historia_clinica) {
         await session.abortTransaction();
-        return res.status(500).send({
+        return res.status(403).send({
           error: true,
-          message: 'La persona ya tiene historia clinica'
+          message: 'FORBIDDEN: La persona ya tiene historia clinica'
         })
       } else {
 
@@ -94,10 +94,7 @@ var controller = {
         //asigno historia clinica a persona
         await persona.updateOne(
           {
-            documento: params.documento,
-            tipo_documento: params.tipo_documento,
-            sexo: params.sexo,
-            apellido: params.apellido
+            _id: params._id,
           },
           { historia_clinica: histID },
           { session: session });
@@ -109,8 +106,9 @@ var controller = {
       await session.abortTransaction();
       console.error("Error en la operacion: " + err);
       return res.status(500).send({
+        error: true,
         status: 'error',
-        message: 'Ha ocurrido un error en la operacion.'
+        message: 'Ha ocurrido un error en el servidor.'
       });
     }
     session.endSession();
