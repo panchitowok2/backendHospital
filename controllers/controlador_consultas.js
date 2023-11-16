@@ -50,7 +50,9 @@ var controller_consulta = {
     try {
       await session.startTransaction();
       const turno_enlazado = await controller_consulta.verificar_turno_enlazado(id_turno)
+      console.log("no paso el turno enlazado");
       if (!turno_enlazado) {
+        console.log("paso el turno enlazado");
         const turno = await Turno.findById(id_turno)
         const paciente= await Persona.findById(turno.persona)
         const historia_clinica= await Historia_clinica.findById(paciente.historia_clinica)

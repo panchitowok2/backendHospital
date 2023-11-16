@@ -1,6 +1,7 @@
 import Turno from "../models/turno.js";
 import Medico from "../models/medico.js";
 import mongoose from "mongoose";
+import controller_consulta from "./controlador_consultas.js";
 
 //cuando ingresemos las horas usar formato 24hr es decir en vez de 9:30 usar 09:30 es decir agregar el 0 adelante
 var controller_turno = {
@@ -18,14 +19,21 @@ var controller_turno = {
         persona: new mongoose.Types.ObjectId(id_paciente)
       })
         .populate("persona");
+        
         console.log("paso el find");
       if (!turnos || turnos.length===0) {
         return null;
 
       }
+
+      const turno_info1=[]
+      for(const turno of turnos){
+        const enlazado=controller_consulta.verificar_turno_enlazado
+      }
       const turnos_info = turnos.map(turno => ({
         _id: turno._id,
         fecha: turno.fecha,
+        hora:turno.hora,
         persona: `${turno.persona.nombre} ${turno.persona.apellido}`,
       }));
       return turnos_info;
