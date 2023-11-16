@@ -4,7 +4,7 @@ import validator from 'validator'
 import historia_clinica from './historia_clinica.js'
 
 let esquemaPersona = new mongoose.Schema({
-    tipo_documento:{type:String, required:true, enum:['DNI','LI', 'LE']},
+    tipo_documento:{type:String, required:true, enum:['DNI','LC', 'LE']},
     documento: {type: Number, required: true},
     nombre: {type: String, required: true},
     apellido: {type: String, required: true},
@@ -32,7 +32,7 @@ let esquemaPersona = new mongoose.Schema({
       required: true,
       validate: {
         validator: function(value) {
-          return ['M', 'F'].includes(value);
+          return ['M', 'F', 'X'].includes(value);
         },
         message: 'El campo sexo debe ser "M" o "F"'
       }
