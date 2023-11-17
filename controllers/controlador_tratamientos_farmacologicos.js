@@ -54,12 +54,8 @@ var controller = {
 
       await session.commitTransaction();
 
-      console.log('Tratamiento creado y agregado a la historia clínica con éxito.');
-
     } catch (err) {
       await session.abortTransaction();
-
-      console.error('Error en la operación:' + err);
 
       return res.status(500).send({
         "message": 'Ha ocurrido un error al ejecutar la transacción', 
@@ -71,6 +67,38 @@ var controller = {
 
     return res.status(200).send(nuevoTratamientoFarmacologico)
   },
+  buscarTratamientosFarmacologicosEnLaFecha: async (req, res) => {
+    const params = req.query
+    
+    const fechaInicio = new Date(params.fecha_inicio)
+    const fechaFinal = new Date(params.fecha_final)
+
+    try {
+      const resultado = await TratamientoFarmacologico.aggregate([
+        {
+          $match: {
+            fecha_inicio: {
+              $gte: fechaInicio,
+              $lte: fechaFinal
+            }
+          }
+        }
+      ])
+
+      if (resultado.length === 0) {
+        return res.status(404).send({
+          'message': 'No se obtuvieron tratamientos farmacologicos en el rango de fechas seleccionado'
+        })
+      }
+  
+      return res.status(200).send(resultado);
+    } catch (err) {
+      return res.status(500).json({ 
+        message: 'Error interno del servidor',
+        errors: err.errors
+      });
+    }
+  }
 
 }
 

@@ -19,5 +19,6 @@ const router = express.Router()
 
 // Ruta para obtener datos de persona
 router.post('/tratamientos_farmacologicos', verificarDosificaciones, existeHistoriaClinica, existeDiagnostico, verificarConsultaDelDiagnostico, verificarDiagnosticoEnHistoriaClinica, verificarMedicoDelDiagnostico, controlador_tratamientos_farmacologicos.altaTratamientoFarmacologico)
+router.get('/tratamientos_farmacologicos/buscar', controlador_tratamientos_farmacologicos.buscarTratamientosFarmacologicosEnLaFecha)
 
 export default router

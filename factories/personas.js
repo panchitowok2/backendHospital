@@ -19,7 +19,7 @@ class FabricaDePersonas {
     const telefono = faker.number.int({ min: 100000000, max: 999999999 });
 
     return {
-      tipo_documento: faker.helpers.arrayElement(['LI', 'LE', 'DNI']),
+      tipo_documento: faker.helpers.arrayElement(['LC', 'LE', 'DNI']),
       documento: dni,
       nombre: firstName,
       apellido: lastName,

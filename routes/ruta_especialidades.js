@@ -4,5 +4,6 @@ import controlador_especialidades from "../controllers/controlador_especialidade
 const router = express.Router()
 router.get('/especialidades', controlador_especialidades.obtenerEspecialidades)
 router.get('/especialidades/:id', controlador_especialidades.getById)
+router.get('/especialidades/:id/tratamientos_farmacologicos', controlador_especialidades.obtenerTratamientosFarmacologicosConEspecialidad)
 
 export default router

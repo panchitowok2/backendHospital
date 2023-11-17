@@ -21,13 +21,12 @@ var controller = {
   * las fechas tienen formato valido
   */
     buscarMedicamentosMasRecetados: async (req, res) => {
-      console.log("entro al metodo antes del aggregate0");
       const params = req.body
-      console.log("entro al metodo antes del aggregate1");
+      
       const fechaInicio = new Date(params.fecha_inicio)
       const fechaFinal = new Date(params.fecha_final)
       const especialidadId = new mongoose.Types.ObjectId(params.especialidad);
-      console.log("entro al metodo antes del aggregate2");
+      
       const resultado = await TratamientoFarmacologico.aggregate([
         {
           $match: {
