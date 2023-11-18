@@ -23,7 +23,7 @@ let esquemaHistoriaClinica = new mongoose.Schema({
     diagnosticos: [
         {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "diagnosticos",
+          ref: "diagnostico",
           default: [] // nombre del modelo al que se hace referencia
         }
       ]

@@ -297,7 +297,59 @@ var controller = {
         mesagge: 'Hubo un error en la elaboracion del informe del paciente.'
       })
     }
+  },
+  obtenerDiagnosticos: async (req, res) => {
+    var params = req.params;
+    const idHistoriaClinica = new mongoose.Types.ObjectId(params.id);
 
+    try {
+        const diagnosticos = await historia_clinica.aggregate([
+          {
+            $match: {
+              _id: idHistoriaClinica // Match con el ID de historia clínica
+            }
+          },
+          {
+            $lookup: {
+              from: 'diagnostico',
+              localField: 'diagnosticos',
+              foreignField: '_id',
+              as: 'diagnostico'
+            }
+          },
+          {
+            $unwind: "$diagnostico"
+          },
+          {
+            $lookup: {
+              from: 'enfermedad',
+              localField: 'diagnostico.enfermedad',
+              foreignField: '_id',
+              as: 'enfermedad'
+            }
+          }
+        ])
+
+        if (diagnosticos.length === 0) 
+          return res.status(404).send({ message: "No existen diagnosticos en la Historia Clínica" })
+
+        // formateamos la salida
+        const resultado = diagnosticos.map(item => ({
+          "_id": item.diagnostico._id,
+          "observaciones": item.diagnostico.observaciones,
+          "descripcion": item.diagnostico.descripcion,
+          "consulta": item.diagnostico.consulta,
+          "enfermedad": item.enfermedad[0],
+        }))
+
+        return res.status(200).send(resultado)
+    } catch (err) {
+      return res.status(500).send({
+        error: true,
+        status: 'error',
+        message: 'Ha ocurrido un error en el servidor.'
+      });
+    }   
   }
 }
 
