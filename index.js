@@ -19,7 +19,7 @@ import ruta_especialidades from "./routes/ruta_especialidades.js"
 const app = express()
 
 // Creamos el servidor con el modulo http por defecto en NodeJS
-const server = http.createServer(app)
+//const server = http.createServer(app)
 
 // Vemos las peticiones por consola utilizando el paquete morgan en modo dev
 app.use(morgan('dev'))
@@ -43,9 +43,5 @@ app.use("/api", ruta_especialidades)
 // Conexion a la base de datos
 mongoose.connect(url).then(() => {
     console.log('Conexion a la base de datos establecida')
-      
-    // Escucha al puerto 
-    server.listen(PORT, () => {
-        console.log('Servidor ejecutandose en http://localhost:', PORT)
-    })
 })
+export default app;
