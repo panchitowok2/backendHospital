@@ -3,7 +3,7 @@ import morgan from 'morgan'
 import cors from 'cors'
 import mongoose from 'mongoose'
 import bodyParser from 'body-parser'
-import {PORT, url} from './config.js'
+import {urlTest, appDebug, url} from './config.js'
 import ruta_persona from './routes/ruta_persona.js'
 import ruta_medicamento from './routes/ruta_medicamento.js'
 import ruta_tratamiento_farmacologico from './routes/ruta_tratamiento_farmacologico.js'
@@ -39,8 +39,14 @@ app.use("/api", ruta_tratamiento_farmacologico)
 app.use("/api", ruta_enfermedades)
 app.use("/api", ruta_especialidades)
 
+var urlConnection = '';
+if(appDebug){
+    urlConnection=urlTest;
+}else{
+    urlConnection=url;
+}
 // Conexion a la base de datos
-mongoose.connect(url).then(() => {
+mongoose.connect(urlConnection).then(() => {
     console.log('Conexion a la base de datos establecida')
 })
 export default app;

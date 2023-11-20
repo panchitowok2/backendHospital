@@ -1,12 +1,12 @@
 import app from '../index'
 import request from 'supertest';
 import { MongoClient } from 'mongodb'
-
+import { urlConeccionTest } from '../config';
 describe('Test del método buscarDatosHistoriaClinica', () => {
   //antes de cada test
   beforeEach(async () => {
     // Conéctate a tu base de datos original
-    const client = new MongoClient('mongodb+srv://panchitowok:39650255@cluster0.hvsz9.mongodb.net?retryWrites=true&w=majority', { useUnifiedTopology: true });
+    const client = new MongoClient(urlConeccionTest, { useUnifiedTopology: true });
     await client.connect();
 
     // Crea una copia de seguridad de tu base de datos original
@@ -22,7 +22,7 @@ describe('Test del método buscarDatosHistoriaClinica', () => {
     await client.close();
 
     // Conéctate a tu base de datos de pruebas
-    const client2 = new MongoClient('mongodb+srv://panchitowok:39650255@cluster0.hvsz9.mongodb.net?retryWrites=true&w=majority', { useUnifiedTopology: true });
+    const client2 = new MongoClient(urlConeccionTest, { useUnifiedTopology: true });
     await client2.connect();
 
     // Restaura la copia de seguridad en tu base de datos de pruebas
@@ -47,7 +47,7 @@ describe('Test del método buscarDatosHistoriaClinica', () => {
 
     // Vacía cada colección
     for (const collection of collections) {
-      await db.collection(collection.name).deleteMany({});
+      //await db.collection(collection.name).deleteMany({});
     }
 
     await client.close();
@@ -66,6 +66,22 @@ describe('Test del método buscarDatosHistoriaClinica', () => {
     expect(res.statusCode).toEqual(404);
     expect(res.body).toHaveProperty('error', true);
   });
+  //La persona no existe y le doy de alta
+  it('La persona no existe y le doy de alta', async () => {
+    //primera solicitud: buscar una persona y que exista en el sistema
+    let res = await request(app)
+      .post('/api/buscar_IdPersona')
+      .send({ apellido: 'Medhurs', documento: 33443222, tipo_documento: 'LE', sexo: 'F' });
+
+    expect(res.statusCode).toEqual(404);
+    expect(res.body).toHaveProperty('error', true);
+
+    res = await request(app)
+      .post('/api/altaPersona')
+      .send({ nombre: 'pepito', apellido: 'Perez', documento: 33443222, tipo_documento: 'LE', sexo: 'F', nacionalidad:'Argentina', direccion:'av siempre viva 123', telefono: 12123123, email: 'pepito@perez.com', fecha_nacimiento: new Date(1990, 10, 10) });
+      expect(res.statusCode).toEqual(200);
+      
+    });
 
   // Puedes agregar más pruebas aquí para los otros casos
 });
