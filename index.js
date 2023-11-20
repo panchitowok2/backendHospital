@@ -1,6 +1,5 @@
 import express from 'express'
 import morgan from 'morgan'
-import http from 'http'
 import cors from 'cors'
 import mongoose from 'mongoose'
 import bodyParser from 'body-parser'

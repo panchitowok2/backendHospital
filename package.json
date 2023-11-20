@@ -9,9 +9,6 @@
     "dev": "nodemon server.js",
     "test": "jest --coverage"
   },
-  "jest": {
-    "setupFilesAfterEnv": ["<rootDir>/test/script_previo_al_test.js"]
-  },
   "author": "Torres Francisco, Polo Jose Luis y Fabi Stefano",
   "license": "MIT",
   "dependencies": {
