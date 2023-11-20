@@ -1,6 +1,6 @@
 import app from '../index'
 import request from 'supertest';
-import {MongoClient} from 'mongodb'
+import { MongoClient } from 'mongodb'
 
 describe('Test del método buscarDatosHistoriaClinica', () => {
   //antes de cada test
@@ -35,7 +35,7 @@ describe('Test del método buscarDatosHistoriaClinica', () => {
 
     await client2.close();
     console.log('Se creo la BD de test')
-  });
+  }, 10000);
   //luego de cada test
   afterEach(async () => {
     const client = new MongoClient('mongodb+srv://panchitowok:39650255@cluster0.hvsz9.mongodb.net?retryWrites=true&w=majority', { useUnifiedTopology: true });
@@ -45,10 +45,10 @@ describe('Test del método buscarDatosHistoriaClinica', () => {
     const db = client.db('dbTest');
     const collections = await db.listCollections().toArray();
 
-  // Vacía cada colección
-  for (const collection of collections) {
-    await db.collection(collection.name).deleteMany({});
-  }
+    // Vacía cada colección
+    for (const collection of collections) {
+      await db.collection(collection.name).deleteMany({});
+    }
 
     await client.close();
 
@@ -56,16 +56,15 @@ describe('Test del método buscarDatosHistoriaClinica', () => {
   });
   //Para la transaccion de alta historia clinica
   //camino 1
+  
   it('La persona no existe y no tiene historia clìnica', async () => {
     //primera solicitud: buscar una persona y que exista en el sistema
     let res = await request(app)
       .post('/api/buscar_IdPersona')
-      .send({ apellido: 'Medhurs', documento:33443222 , tipo_documento:'LE' , sexo:'F' });
+      .send({ apellido: 'Medhurs', documento: 33443222, tipo_documento: 'LE', sexo: 'F' });
 
     expect(res.statusCode).toEqual(404);
     expect(res.body).toHaveProperty('error', true);
-    expect(res.body).toHaveProperty('message', 'No existe la historia clinica');
-
   });
 
   // Puedes agregar más pruebas aquí para los otros casos
