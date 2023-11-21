@@ -1,9 +1,9 @@
-import app from '../index'
+import app from '../../index'
 import request from 'supertest';
 import { MongoClient } from 'mongodb'
-import { urlConeccionTest } from '../config';
+import { urlConeccionTest } from '../../config';
 
-describe('Test del método buscarDatosHistoriaClinica', () => {
+describe('Camino 1: Alta tratamiento farmacologico', () => {
   //antes de cada test
   beforeEach(async () => {
     // Conéctate a tu base de datos original
@@ -37,36 +37,18 @@ describe('Test del método buscarDatosHistoriaClinica', () => {
 
     await client2.close();
     console.log('Se creo la BD de test')
-  }, 10000);
+  }, 30000);
 
   //Para la transaccion de alta historia clinica
   //camino 1
-  
-  it('La persona no existe y no tiene historia clìnica', async () => {
+  it('Camino 1: La persona no existe', async () => {
     //primera solicitud: buscar una persona y que exista en el sistema
-    let res = await request(app)
+    var idPersona = await request(app)
       .post('/api/buscar_IdPersona')
-      .send({ apellido: 'Medhurs', documento: 33443222, tipo_documento: 'LE', sexo: 'F' });
+      .send({ apellido: 'Fabi', documento: 39881919, tipo_documento: 'LE', sexo: 'M' });
 
-    expect(res.statusCode).toEqual(404);
-    expect(res.body).toHaveProperty('error', true);
-  });
-  //La persona no existe y le doy de alta
-  it('La persona no existe y le doy de alta', async () => {
-    //primera solicitud: buscar una persona y que exista en el sistema
-    let res = await request(app)
-      .post('/api/buscar_IdPersona')
-      .send({ apellido: 'Medhurs', documento: 33443222, tipo_documento: 'LE', sexo: 'F' });
+    expect(idPersona.status).toEqual(404);
+    expect(idPersona.body).toHaveProperty('error', true);
+  }, 15000);
 
-    expect(res.statusCode).toEqual(404);
-    expect(res.body).toHaveProperty('error', true);
-
-    res = await request(app)
-      .post('/api/altaPersona')
-      .send({ nombre: 'pepito', apellido: 'Perez', documento: 33443222, tipo_documento: 'LE', sexo: 'F', nacionalidad:'Argentina', direccion:'av siempre viva 123', telefono: 12123123, email: 'pepito@perez.com', fecha_nacimiento: new Date(1990, 10, 10) });
-      expect(res.statusCode).toEqual(200);
-      
-    });
-
-  // Puedes agregar más pruebas aquí para los otros casos
 });
