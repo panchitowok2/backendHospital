@@ -2,6 +2,7 @@ import historia_clinica from '../models/historia_clinica.js';
 import persona from '../models/persona.js'
 import mongoose from 'mongoose';
 import functions from './functions/functions_personas.js'
+import tratamiento_farmacologico from '../models/tratamiento_farmacologico.js';
 
 var controller = {
   //buscar id historia clinica segun datos de paciente
@@ -131,8 +132,10 @@ var controller = {
   */
   elaborarInformePaciente: async (req, res) => {
     var params = req.body
+    var resultado = []
+    var datosTratamiento = {};
     try {
-      const resultado = await persona.aggregate([
+      resultado = await persona.aggregate([
         {
           $match: {
             _id: new mongoose.Types.ObjectId(params._id)
@@ -163,15 +166,6 @@ var controller = {
             as: "consultas"
           }
         },
-
-        {
-          $lookup: {
-            from: "diagnostico",
-            localField: "tratamientos_farmacologicos.diagnostico",
-            foreignField: "_id",
-            as: "diagnosticos_tratamiento"
-          }
-        },
         {
           $lookup: {
             from: "medico",
@@ -180,46 +174,7 @@ var controller = {
             as: "medicos"
           }
         },
-        {
-          $lookup: {
-            from: "persona",
-            localField: "medicos.persona",
-            foreignField: "_id",
-            as: "datosPersonalesMedicoQueAtendioConsulta"
-          }
-        },
-        {
-          $lookup: {
-            from: "medico",
-            localField: "tratamientos_farmacologicos.medico",
-            foreignField: "_id",
-            as: "medicosDeTratamientosFarmacologicos"
-          }
-        },
-        {
-          $lookup: {
-            from: "persona",
-            localField: "medicosDeTratamientosFarmacologicos.persona",
-            foreignField: "_id",
-            as: "datosPersonalesMedicoQueRecetoTratamientoFarmacologico"
-          }
-        },
-        {
-          $lookup: {
-            from: "dosificacion",
-            localField: "tratamientos_farmacologicos.dosificaciones",
-            foreignField: "_id",
-            as: "dosificacionesTratamientosFarmacologicos"
-          }
-        },
-        {
-          $lookup: {
-            from: "medicamento",
-            localField: "dosificacionesTratamientosFarmacologicos.medicamento",
-            foreignField: "_id",
-            as: "medicamentoDosificacion"
-          }
-        },
+
         {
           $project: {
             _id: 0, // Elimina el campo _id de la salida
@@ -228,68 +183,22 @@ var controller = {
             "historia_clinica.consultas": 0,
             "historia_clinica.diagnosticos": 0,
             "historia_clinica.__v": 0,
-            "tratamientos_farmacologicos._id": 0,
-            "tratamientos_farmacologicos.diagnostico": 0,
-            "tratamientos_farmacologicos.medico": 0,
-            "tratamientos_farmacologicos.dosificaciones": 0,
-            "tratamientos_farmacologicos.__v": 0,
             "consultas._id": 0,
             "consultas.medico": 0,
             "consultas.turno": 0,
             "consultas.__v": 0,
-            "diagnosticos_tratamiento._id": 0,
-            "diagnosticos_tratamiento.consulta": 0,
-            "diagnosticos_tratamiento.enfermedad": 0,
-            "diagnosticos_tratamiento.__v": 0,
             "medicos._id": 0,
             "medicos.especialidades": 0,
             "medicos.persona": 0,
             "medicos.__v": 0,
-            "datosPersonalesMedicoQueAtendioConsulta._id": 0,
-            "datosPersonalesMedicoQueAtendioConsulta.historia_clinica": 0,
-            "datosPersonalesMedicoQueAtendioConsulta.__v": 0,
-            "medicosDeTratamientosFarmacologicos._id": 0,
-            "medicosDeTratamientosFarmacologicos.historia_clinica": 0,
-            "medicosDeTratamientosFarmacologicos.__v": 0,
-            "datosPersonalesMedicoQueRecetoTratamientoFarmacologico._id": 0,
-            "datosPersonalesMedicoQueRecetoTratamientoFarmacologico.historia_clinica": 0,
-            "datosPersonalesMedicoQueRecetoTratamientoFarmacologico.__v": 0,
-            "dosificacionesTratamientosFarmacologicos._id": 0,
-            "dosificacionesTratamientosFarmacologicos.medicamento": 0,
-            "dosificacionesTratamientosFarmacologicos.__v": 0,
-            "medicamentoDosificacion._id": 0,
-            "medicamentoDosificacion.__v": 0,
           }
         }
       ])
-      //console.log(resultado[0].medicos)
-
-      const datosMedicosFinal = resultado[0].medicos.map((medico, index) => {
-        return {
-          datosMedico: medico,
-          datosPersonales: resultado[0].datosPersonalesMedicoQueAtendioConsulta[index],
-        }
-      })
+      //console.log('Los tratamientos farmacologicos: ', resultado[0].tratamientos_farmacologicos)
 
       //console.log(datosMedicosFinal)
       //console.log('Resultado de la agregación:', resultado);
-      return res.status(200).send(
-        resultado.map((resultado) => ({
-          tipo_documento: resultado.tipo_documento,
-          documento: resultado.documento,
-          nombre: resultado.nombre,
-          apellido: resultado.apellido,
-          historia_clinica: resultado.historia_clinica,
-          tratamientos_farmacologicos: resultado.tratamientos_farmacologicos,
-          consultas: resultado.consultas,
-          diagnosticos_tratamiento: resultado.diagnosticos_tratamiento,
-          datosPersonalesMedicoQueAtendioConsulta: datosMedicosFinal,
-          profesionalQueRecetoTratamiento: resultado.datosPersonalesMedicoQueRecetoTratamientoFarmacologico,
-          dosificacionDeCadaTratamiento: resultado.dosificacionesTratamientosFarmacologicos,
-          medicamentoDosificado: resultado.medicamentoDosificacion,
 
-        }))
-      )
     } catch (error) {
       console.log(error)
       return res.status(500).send({
@@ -297,59 +206,141 @@ var controller = {
         mesagge: 'Hubo un error en la elaboracion del informe del paciente.'
       })
     }
+
+    try {
+      for (let tratamiento of resultado[0].tratamientos_farmacologicos) {
+        let iteracion = await tratamiento_farmacologico.aggregate([
+          {
+            $match: {
+              _id: new mongoose.Types.ObjectId(tratamiento._id)
+            }
+          },
+          {
+            $lookup: {
+              from: "dosificacion",
+              localField: "dosificaciones",
+              foreignField: "_id",
+              as: "dosificacionesTratamiento"
+            }
+          },
+          {
+            $lookup: {
+              from: "medicamento",
+              localField: "dosificacionesTratamiento.medicamento",
+              foreignField: "_id",
+              as: "medicamentoDosificaciones"
+            }
+          },
+          {
+            $lookup: {
+              from: "medico",
+              localField: "medico",
+              foreignField: "_id",
+              as: "medicoRecetoTratamiento"
+            }
+          },
+          {
+            $lookup: {
+              from: "diagnostico",
+              localField: "diagnostico",
+              foreignField: "_id",
+              as: "diagnosticoTratamiento"
+            }
+          },
+          {
+            $project: {
+              _id: 0,
+              diagnostico: 0,
+              dosificaciones: 0,
+              medico: 0,
+              __v: 0,              
+            "dosificacionesTratamiento._id": 0,
+            "dosificacionesTratamiento.medicamento": 0,
+            "dosificacionesTratamiento.__v": 0,
+            "medicamentoDosificaciones._id": 0,
+            "medicamentoDosificaciones.__v": 0,
+            "medicoRecetoTratamiento._id": 0,
+            "medicoRecetoTratamiento.especialidades": 0,
+            "medicoRecetoTratamiento.persona": 0,
+            "medicoRecetoTratamiento.__v": 0,
+            "diagnosticoTratamiento._id": 0,
+            "diagnosticoTratamiento.consulta": 0,
+            "diagnosticoTratamiento.enfermedad": 0,
+            "diagnosticoTratamiento.__v": 0,
+            }
+          }
+        ])
+        datosTratamiento[tratamiento.descripcion] = iteracion;
+      }
+    } catch (error) {
+      console.log(error)
+      return res.status(500).send({
+        error: true,
+        mesagge: 'Hubo un error con los tratamientos farmacológicos.'
+      })
+    }
+
+    return res.status(200).send(
+      resultado.map((resultado) => ({
+        datosTratamientos: datosTratamiento,
+        historia_clinica: resultado.historia_clinica,
+        consultas: resultado.consultas,
+        medicoQueAtendioConsulta: resultado.medicos,
+      }))
+    )
   },
   obtenerDiagnosticos: async (req, res) => {
     var params = req.params;
     const idHistoriaClinica = new mongoose.Types.ObjectId(params.id);
 
     try {
-        const diagnosticos = await historia_clinica.aggregate([
-          {
-            $match: {
-              _id: idHistoriaClinica // Match con el ID de historia clínica
-            }
-          },
-          {
-            $lookup: {
-              from: 'diagnostico',
-              localField: 'diagnosticos',
-              foreignField: '_id',
-              as: 'diagnostico'
-            }
-          },
-          {
-            $unwind: "$diagnostico"
-          },
-          {
-            $lookup: {
-              from: 'enfermedad',
-              localField: 'diagnostico.enfermedad',
-              foreignField: '_id',
-              as: 'enfermedad'
-            }
+      const diagnosticos = await historia_clinica.aggregate([
+        {
+          $match: {
+            _id: idHistoriaClinica // Match con el ID de historia clínica
           }
-        ])
+        },
+        {
+          $lookup: {
+            from: 'diagnostico',
+            localField: 'diagnosticos',
+            foreignField: '_id',
+            as: 'diagnostico'
+          }
+        },
+        {
+          $unwind: "$diagnostico"
+        },
+        {
+          $lookup: {
+            from: 'enfermedad',
+            localField: 'diagnostico.enfermedad',
+            foreignField: '_id',
+            as: 'enfermedad'
+          }
+        }
+      ])
 
-        if (diagnosticos.length === 0) 
-          return res.status(404).send({ message: "No existen diagnosticos en la Historia Clínica" })
+      if (diagnosticos.length === 0)
+        return res.status(404).send({ message: "No existen diagnosticos en la Historia Clínica" })
 
-        // formateamos la salida
-        const resultado = diagnosticos.map(item => ({
-          "_id": item.diagnostico._id,
-          "observaciones": item.diagnostico.observaciones,
-          "descripcion": item.diagnostico.descripcion,
-          "consulta": item.diagnostico.consulta,
-          "enfermedad": item.enfermedad[0],
-        }))
+      // formateamos la salida
+      const resultado = diagnosticos.map(item => ({
+        "_id": item.diagnostico._id,
+        "observaciones": item.diagnostico.observaciones,
+        "descripcion": item.diagnostico.descripcion,
+        "consulta": item.diagnostico.consulta,
+        "enfermedad": item.enfermedad[0],
+      }))
 
-        return res.status(200).send(resultado)
+      return res.status(200).send(resultado)
     } catch (err) {
       return res.status(500).send({
         error: true,
         status: 'error',
         message: 'Ha ocurrido un error en el servidor.'
       });
-    }   
+    }
   }
 }
 
