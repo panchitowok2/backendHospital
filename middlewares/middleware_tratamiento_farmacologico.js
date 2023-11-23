@@ -9,6 +9,9 @@ const verificarDosificaciones = async (req, res, next) => {
   if (!params.dosificaciones || !Array.isArray(params.dosificaciones)) {
       return res.status(400).json({ message: 'El campo "dosificaciones" debe ser un array' });
   }
+
+  if (params.dosificaciones.length === 0)
+    return res.status(400).json({ message: 'El campo "dosificaciones" no debe estar vacio' });
   
   next();
 };
