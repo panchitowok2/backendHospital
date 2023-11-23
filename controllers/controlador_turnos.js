@@ -6,7 +6,7 @@ import controller_consulta from "./controlador_consultas.js";
 //cuando ingresemos las horas usar formato 24hr es decir en vez de 9:30 usar 09:30 es decir agregar el 0 adelante
 var controller_turno = {
 
-  buscar_turno: async (fecha1, hora1, hora2, id_medico, id_paciente) => {
+  buscar_turno: async (fecha1, id_medico, id_paciente) => {
     try {
       console.log("inicio el metodo");
       const fechaEntrada=fecha1
@@ -14,7 +14,6 @@ var controller_turno = {
       console.log("llego antes del find");
       const turnos = await Turno.find({
         fecha: { $gte:fechaEntrada},
-        hora: { $gte: hora1, $lte: hora2 },
         medico: new mongoose.Types.ObjectId(id_medico),
         persona: new mongoose.Types.ObjectId(id_paciente)
       })
@@ -47,7 +46,7 @@ var controller_turno = {
     let params = req.body;
     try {
       console.log("entro el request");
-      const turno_info = await controller_turno.buscar_turno(new Date(params.fecha), params.hora1, params.hora2, params.id_medico, params.id_paciente);
+      const turno_info = await controller_turno.buscar_turno(new Date(params.fecha), params.id_medico, params.id_paciente);
       if (!turno_info) {
         return res.status(404).send({
           error: true,
