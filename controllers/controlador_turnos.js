@@ -8,10 +8,10 @@ var controller_turno = {
 
   buscar_turno: async (fecha1, id_medico, id_paciente) => {
     try {
-      console.log("inicio el metodo");
+      //console.log("inicio el metodo");
       const fechaEntrada=fecha1
       fechaEntrada.setHours(0, 0, 0, 0);
-      console.log("llego antes del find");
+      //console.log("llego antes del find");
       const turnos = await Turno.find({
         fecha: { $gte:fechaEntrada},
         medico: new mongoose.Types.ObjectId(id_medico),
@@ -26,16 +26,47 @@ var controller_turno = {
       }
 
       const turno_info1=[]
-      for(const turno of turnos){
-        const enlazado=controller_consulta.verificar_turno_enlazado
+      //console.log(turnos);
+
+      const turnosFiltrados = await Promise.all(
+        turnos.map(async (turno) => {
+          const enlazado = await controller_consulta.verificar_turno_enlazado(turno._id);
+          if (!enlazado) {
+            return {
+              _id: turno._id,
+              fecha: turno.fecha,
+              hora: turno.hora,
+              persona: `${turno.persona.nombre} ${turno.persona.apellido}`,
+            };
+          }
+          return null;
+        }))
+
+        const turnos_info = turnosFiltrados.filter(turno => turno !== null);
+        if (turnos_info.length==0) {
+          return null;
+        }
+
+
+
+       return turnos_info;
+
+/*
+
+      const turnosFiltrados = turnos.filter(turno => ( controller_consulta.verificar_turno_enlazado(turno._id)));
+      //console.log(turnosFiltrados);
+      if (turnosFiltrados.length==0) {
+        return null;
       }
-      const turnos_info = turnos.map(turno => ({
+      const turnos_info = turnosFiltrados.map(turno => ({
         _id: turno._id,
         fecha: turno.fecha,
         hora:turno.hora,
         persona: `${turno.persona.nombre} ${turno.persona.apellido}`,
       }));
       return turnos_info;
+      */
+      
     } catch (error) {
       throw new Error('No ha sido posible buscar los médicos');
     }

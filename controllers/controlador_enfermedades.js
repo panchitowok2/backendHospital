@@ -7,7 +7,7 @@ var controller_enfermedad = {
       
       const enfermedades = await Enfermedad.find({}).select("_id nombre")
       .sort({ nombre: 1 })
-      if (!enfermedades) {
+      if (enfermedades.length==0) {
         return null;
       }
      

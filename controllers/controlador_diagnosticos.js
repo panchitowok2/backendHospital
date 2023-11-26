@@ -4,11 +4,11 @@ import Historia_clinica from "../models/historia_clinica.js";
 import controlador_consulta from "./controlador_consultas.js";
 import mongoose from "mongoose";
 import { format } from "date-fns";
+import diagnostico from "../models/diagnostico.js";
 
 var controller_diagnostico = {
-  guardar_diagnosticoDB: async (observacion, descripcion, id_consulta, id_enfermedad, id_historia_clinica) => {
+  guardar_diagnosticoDB: async (observacion, descripcion, id_consulta, id_enfermedad, id_historia_clinica,session) => {
 
-    const session = await mongoose.startSession();
 
     try {
       await session.startTransaction();
@@ -20,17 +20,17 @@ var controller_diagnostico = {
       nuevo_diagnostico.consulta = id_consulta
 
       nuevo_diagnostico.enfermedad = new mongoose.Types.ObjectId(id_enfermedad)
-
+      const historia_clinica = await Historia_clinica.findById(id_historia_clinica);
       const diagnostico_guardada = await nuevo_diagnostico.save();
       console.log("se hizo el save");
-      if (!diagnostico_guardada) {
+      if (!diagnostico_guardada || historia_clinica==null) {
         await session.abortTransaction();
         await session.endSession();
         return "error no se pudo guardar el diagnostico"
 
       }
 
-      const historia_clinica = await Historia_clinica.findById(id_historia_clinica);
+  
       historia_clinica.diagnosticos.push(diagnostico_guardada)
       await historia_clinica.save();
       await session.commitTransaction();
@@ -47,9 +47,16 @@ var controller_diagnostico = {
   guardar_diagnostico: async (req, res) => {
     try {
       var params = req.body
-      const id_consulta = await controlador_consulta.guardar_consultaDB(params.sintomas_consultas, params.observacion_consulta, params.fecha_consulta, params.id_turno)
-      console.log("guardo la consulta el id es: " + id_consulta);
-      const diagnostico_id = await controller_diagnostico.guardar_diagnosticoDB(params.observacion_diagostico, params.descripcion_diagnostico, id_consulta, params.id_enfermedad, params.id_historia_clinica)
+      const session = await mongoose.startSession();
+      const id_consulta = await controlador_consulta.guardar_consultaDB(params.sintomas_consultas, params.observacion_consulta, params.fecha_consulta, params.id_turno,params.id_historia_clinica,session)
+
+      if (id_consulta=="error no se pudo guardar la consulta") {
+        return res.status(404).send({
+          error: true,
+          message: "no se pudo guardar el diagnostico por problemas con la consulta",
+        });
+      }
+      const diagnostico_id = await controller_diagnostico.guardar_diagnosticoDB(params.observacion_diagostico, params.descripcion_diagnostico, id_consulta, params.id_enfermedad, params.id_historia_clinica,session)
       if (diagnostico_id == "error no se pudo guardar el diagnostico") {
         return res.status(404).send({
           error: true,
@@ -313,7 +320,42 @@ var controller_diagnostico = {
       console.error(error);
       return res.status(500).json({ message: 'Error interno del servidor' });
     }
+  },
+  buscar_diagnosticos_por_enfermedadDB: async(id_enfermedad)=>{
+    const resultados=await Diagnostico.find({enfermedad:new mongoose.Types.ObjectId(id_enfermedad)})
+    if ( resultados.length==0) {
+      return null;
+      
+    }
+    return resultados;
+  },
+  buscar_diagnosticos_por_enfermedad:async(req,res)=>{
+    try {
+      const params=req.body;
+      const diagnosticos= await controller_diagnostico.buscar_diagnosticos_por_enfermedadDB(params.id_enfermedad)
+      console.log("paso el buscar");
+      console.log("paso el buscar");
+      console.log("paso el buscar");
+      console.log("paso el buscar");
+      console.log("paso el buscar");
+      console.log("paso el buscar");
+      console.log("paso el buscar");
+      console.log("paso el buscar");
+      if (diagnosticos==null) {
+        return res.status(404).json({
+          error: true,
+          message: 'Diagnósticos no encontrado' });
+      }
+      return res.status(200).json(diagnosticos);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({
+        error: true,
+        message: 'Error interno del servidor' });
+    }
+
   }
+
 
 }
 export default controller_diagnostico

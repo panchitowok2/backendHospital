@@ -9,7 +9,7 @@ var controller_medico = {
         .populate("especialidades")
         .populate("persona");
 
-      if (!medicos) {
+      if (medicos.length==0) {
         return null;
       }
     
