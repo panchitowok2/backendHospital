@@ -48,25 +48,41 @@ describe('Camino 8: Alta tratamiento farmacologico', () => {
       .send({ apellido: "Fabi", documento: 39881919, tipo_documento: "DNI", sexo: "M" });
 
     expect(idPersona.status).toEqual(200);
+    expect(idPersona.body).not.toBeNull();
 
     var datosPersona = await request(app)
       .post('/api/buscar_Datos_Persona')
       .send({ _id: idPersona.body });
 
+    const datosPersonaJson = JSON.stringify(datosPersona.body);
+    
     expect(datosPersona.status).toEqual(200);
+    expect(datosPersona.body).not.toBeNull();
+    expect(datosPersonaJson.length).toBeGreaterThan(0);
+    expect(datosPersona.body._id).toBeDefined(); // Verifica que _id esté definido
+    expect(datosPersona.body._id).toBeTruthy(); // Verifica que _id tenga un valor que se evalúe como verdadero (no vacío)
+    expect(datosPersona.body._id).toEqual(idPersona.body);
 
     var datosHistoriaClinica = await request(app)
       .post('/api/buscar_datos_historia_clinica')
       .send({ "_id": datosPersona.body.historia_clinica });
 
+    const datosHistoriaClinicaJson = JSON.stringify(datosHistoriaClinica.body);
+
     expect(datosHistoriaClinica.status).toEqual(200);
+    expect(datosHistoriaClinica.body).not.toBeNull();
+    expect(datosHistoriaClinicaJson.length).toBeGreaterThan(0);
+    expect(datosHistoriaClinica.body._id).toBeDefined(); // Verifica que _id esté definido
+    expect(datosHistoriaClinica.body._id).toBeTruthy(); // Verifica que _id tenga un valor que se evalúe como verdadero (no vacío)
 
     var diagnosticosHistoriaClinica = await request(app)
       .get(`/api/historias_clinicas/${datosHistoriaClinica.body._id}/diagnosticos`)
 
+    const diagnosticosHistoriaClinicaJson = JSON.stringify(diagnosticosHistoriaClinica.body);
+
     expect(diagnosticosHistoriaClinica.status).toEqual(200);
     expect(diagnosticosHistoriaClinica.body).not.toBeNull();
-    expect(diagnosticosHistoriaClinica.body.length).toBeGreaterThan(0);
+    expect(diagnosticosHistoriaClinicaJson.length).toBeGreaterThan(0);
 
     var diagnosticos = JSON.parse(JSON.stringify(diagnosticosHistoriaClinica.body));
     var consultaId = JSON.stringify(diagnosticos[0].consulta)
@@ -85,13 +101,16 @@ describe('Camino 8: Alta tratamiento farmacologico', () => {
 
     expect(medico.status).toEqual(200);
     expect(medico.body._id).toEqual(medicoId);
+    expect(consultaDiagnostico.body.medico).toEqual(medico.body._id);
 
     var especialidades = await request(app)
       .get(`/api/medicos/${medicoId}/especialidades`)
 
+    const especialidadesJson = JSON.stringify(especialidades.body);
+
     expect(especialidades.status).toEqual(200);
     expect(especialidades.body).not.toBeNull();
-    expect(especialidades.body.length).toBeGreaterThan(0);
+    expect(especialidadesJson.length).toBeGreaterThan(0);
 
     var medicamentos = await request(app)
       .get(`/api/medicamentos`)

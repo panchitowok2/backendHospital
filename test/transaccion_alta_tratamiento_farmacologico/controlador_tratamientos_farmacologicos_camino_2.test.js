@@ -46,6 +46,7 @@ describe('Camino 2: Alta tratamiento farmacologico', () => {
       .send({ apellido: 'Fabi', documento: 39881919, tipo_documento: 'DNI', sexo: 'M' });
 
     expect(idPersona.status).toEqual(200);
+    expect(idPersona.body).not.toBeNull();
 
     var datosPersona = await request(app)
       .post('/api/buscar_Datos_Persona')

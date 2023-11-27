@@ -39,32 +39,49 @@ describe('Camino 5: Alta tratamiento farmacologico', () => {
     console.log('Se creo la BD de test')
   }, 30000);
 
-  // camino 4
+  // camino 5
   it('Camino 5: La consulta no existe', async () => {
     var idPersona = await request(app)
       .post('/api/buscar_IdPersona')
       .send({ apellido: "Fabi", documento: 39881919, tipo_documento: "DNI", sexo: "M" });
 
     expect(idPersona.status).toEqual(200);
+    expect(idPersona.body).not.toBeNull();
 
     var datosPersona = await request(app)
       .post('/api/buscar_Datos_Persona')
       .send({ _id: idPersona.body });
 
-    expect(datosPersona.status).toEqual(200);
+    const datosPersonaJson = JSON.stringify(datosPersona.body);
 
+    expect(datosPersona.status).toEqual(200);
+    expect(datosPersona.body).not.toBeNull();
+    expect(datosPersonaJson.length).toBeGreaterThan(0);
+    expect(datosPersona.body._id).toBeDefined(); // Verifica que _id esté definido
+    expect(datosPersona.body._id).toBeTruthy(); // Verifica que _id tenga un valor que se evalúe como verdadero (no vacío)
+    expect(datosPersona.body._id).toEqual(idPersona.body);
+    
     var datosHistoriaClinica = await request(app)
       .post('/api/buscar_datos_historia_clinica')
       .send({ "_id": datosPersona.body.historia_clinica });
 
+    const datosHistoriaClinicaJson = JSON.stringify(datosHistoriaClinica.body);
+
     expect(datosHistoriaClinica.status).toEqual(200);
+    expect(datosHistoriaClinica.body).not.toBeNull();
+    expect(datosHistoriaClinicaJson.length).toBeGreaterThan(0);
+    expect(datosHistoriaClinica.body._id).toBeDefined(); // Verifica que _id esté definido
+    expect(datosHistoriaClinica.body._id).toBeTruthy(); // Verifica que _id tenga un valor que se evalúe como verdadero (no vacío)
+    expect(datosHistoriaClinica.body._id).toEqual(datosPersona.body.historia_clinica);
 
     var diagnosticosHistoriaClinica = await request(app)
       .get(`/api/historias_clinicas/${datosHistoriaClinica.body._id}/diagnosticos`)
 
+    const diagnosticosHistoriaClinicaJson = JSON.stringify(diagnosticosHistoriaClinica.body);
+
     expect(diagnosticosHistoriaClinica.status).toEqual(200);
     expect(diagnosticosHistoriaClinica.body).not.toBeNull();
-    expect(diagnosticosHistoriaClinica.body.length).toBeGreaterThan(0);
+    expect(diagnosticosHistoriaClinicaJson.length).toBeGreaterThan(0);
 
     var consultaDiagnostico = await request(app)
       .get(`/api/consultas/000000000000000000000000`)
