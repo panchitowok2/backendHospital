@@ -83,16 +83,13 @@ var controller = {
 
       const personas = await Persona.create([params], { session: session });
       persona = personas[0];
-      const personaId = persona._id;
-      console.log("La nueva persona es: " + personaId);
-
       //termino la transaccion 
       await session.commitTransaction();
-      console.log("Persona creada y guardada con exito :D")
+      console.log("Persona creada y guardada con exito.")
     } catch (err) {
       await session.abortTransaction();
-      console.error("Error en la operacion: " + err);
       return res.status(500).send({
+        error: true,
         status: 'error',
         message: 'Ha ocurrido un error en la operacion.'
       });
