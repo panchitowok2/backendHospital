@@ -3,7 +3,7 @@ import request from 'supertest';
 import { MongoClient } from 'mongodb'
 import { urlConeccionTest } from '../../config';
 
-describe('Camino 6: Alta tratamiento farmacologico', () => {
+describe('Camino 2: Alta tratamiento farmacologico', () => {
   //antes de cada test
   beforeEach(async () => {
     // Conéctate a tu base de datos original
@@ -39,49 +39,21 @@ describe('Camino 6: Alta tratamiento farmacologico', () => {
     console.log('Se creo la BD de test')
   }, 30000);
 
-  // camino 4
-  it('Camino 6: El Medico no existe', async () => {
+  // camino 2
+  it('Camino 2: El Id de la persona no existe', async () => {
     var idPersona = await request(app)
       .post('/api/buscar_IdPersona')
-      .send({ apellido: "Fabi", documento: 39881919, tipo_documento: "DNI", sexo: "M" });
+      .send({ apellido: 'Fabi', documento: 39881919, tipo_documento: 'DNI', sexo: 'M' });
 
     expect(idPersona.status).toEqual(200);
+    expect(idPersona.body).not.toBeNull();
 
     var datosPersona = await request(app)
       .post('/api/buscar_Datos_Persona')
-      .send({ _id: idPersona.body });
+      .send({ id: 'esteIdNoExisteError404' });
 
-    expect(datosPersona.status).toEqual(200);
-
-    var datosHistoriaClinica = await request(app)
-      .post('/api/buscar_datos_historia_clinica')
-      .send({ "_id": datosPersona.body.historia_clinica });
-
-    expect(datosHistoriaClinica.status).toEqual(200);
-
-    var diagnosticosHistoriaClinica = await request(app)
-      .get(`/api/historias_clinicas/${datosHistoriaClinica.body._id}/diagnosticos`)
-
-    expect(diagnosticosHistoriaClinica.status).toEqual(200);
-    expect(diagnosticosHistoriaClinica.body).not.toBeNull();
-    expect(diagnosticosHistoriaClinica.body.length).toBeGreaterThan(0);
-
-    var diagnosticos = JSON.parse(JSON.stringify(diagnosticosHistoriaClinica.body));
-    var consultaId = JSON.stringify(diagnosticos[0].consulta)
-    consultaId = consultaId.slice(1, -1) // PARA ELIMINAR LAS DOBLES COMILLAS
-    
-    var consultaDiagnostico = await request(app)
-      .get(`/api/consultas/${consultaId}`)
-
-    expect(consultaDiagnostico.status).toEqual(200);
-    expect(consultaDiagnostico.body._id).toEqual(consultaId);
-
-    var medico = await request(app)
-      .get(`/api/medicos/000000000000000000000000`)
-
-    expect(medico.status).toEqual(404);
-
-  }, 30000);
-
+    expect(datosPersona.status).toEqual(404);
+    expect(datosPersona.body).toHaveProperty('error', true);
+  }, 15000);
 
 });

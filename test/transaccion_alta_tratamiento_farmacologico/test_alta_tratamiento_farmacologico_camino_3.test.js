@@ -3,7 +3,7 @@ import request from 'supertest';
 import { MongoClient } from 'mongodb'
 import { urlConeccionTest } from '../../config';
 
-describe('Camino 2: Alta tratamiento farmacologico', () => {
+describe('Camino 3: Alta tratamiento farmacologico', () => {
   //antes de cada test
   beforeEach(async () => {
     // Conéctate a tu base de datos original
@@ -39,20 +39,34 @@ describe('Camino 2: Alta tratamiento farmacologico', () => {
     console.log('Se creo la BD de test')
   }, 30000);
 
-  // camino 2
-  it('Camino 2: El Id de la persona no existe', async () => {
+  // camino 3
+  it('Camino 3: La persona no tiene historia clínica', async () => {
     var idPersona = await request(app)
       .post('/api/buscar_IdPersona')
-      .send({ apellido: 'Fabi', documento: 39881919, tipo_documento: 'DNI', sexo: 'M' });
+      .send({ apellido: "Brekke-Satterfield", documento: 98960066, tipo_documento: "DNI", sexo: "M" });
 
     expect(idPersona.status).toEqual(200);
+    expect(idPersona.body).not.toBeNull();
 
     var datosPersona = await request(app)
       .post('/api/buscar_Datos_Persona')
-      .send({ id: 'esteIdNoExisteError404' });
+      .send({ _id: idPersona.body });
 
-    expect(datosPersona.status).toEqual(404);
-    expect(datosPersona.body).toHaveProperty('error', true);
+    const datosPersonaJson = JSON.stringify(datosPersona.body);
+
+    expect(datosPersona.status).toEqual(200);
+    expect(datosPersona.body).not.toBeNull();
+    expect(datosPersonaJson.length).toBeGreaterThan(0);
+    expect(datosPersona.body._id).toBeDefined(); // Verifica que _id esté definido
+    expect(datosPersona.body._id).toBeTruthy(); // Verifica que _id tenga un valor que se evalúe como verdadero (no vacío)
+    expect(datosPersona.body._id).toEqual(idPersona.body);
+    
+    var datosHistoriaClinica = await request(app)
+      .post('/api/buscar_datos_historia_clinica')
+      .send({ _id: datosPersona.body.historia_clinica });
+
+    expect(datosHistoriaClinica.status).toEqual(404);
+    expect(datosHistoriaClinica.body).toHaveProperty('error', true);
   }, 15000);
 
 });

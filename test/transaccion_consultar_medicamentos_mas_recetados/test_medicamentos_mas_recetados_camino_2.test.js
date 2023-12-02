@@ -3,7 +3,7 @@ import request from 'supertest';
 import { MongoClient } from 'mongodb'
 import { urlConeccionTest } from '../../config';
 
-describe('Camino 3: Alta tratamiento farmacologico', () => {
+describe('Camino 2: Consultar medicamentos mas recetados', () => {
   //antes de cada test
   beforeEach(async () => {
     // Conéctate a tu base de datos original
@@ -39,27 +39,24 @@ describe('Camino 3: Alta tratamiento farmacologico', () => {
     console.log('Se creo la BD de test')
   }, 30000);
 
-  // camino 3
-  it('Camino 3: La persona no tiene historia clínica', async () => {
-    var idPersona = await request(app)
-      .post('/api/buscar_IdPersona')
-      .send({ apellido: "Brekke-Satterfield", documento: 98960066, tipo_documento: "DNI", sexo: "M" });
+  //camino 2
+  it('Camino 2: No existen tratamientos farmacológicos recetados por dicho especialista', async () => {
+    var especialidades = await request(app)
+      .get('/api/especialidades');
 
-    expect(idPersona.status).toEqual(200);
+    const especialidadesJson = JSON.stringify(especialidades.body);
 
-    var datosPersona = await request(app)
-      .post('/api/buscar_Datos_Persona')
-      .send({ _id: idPersona.body });
+    expect(especialidades.status).toEqual(200);
+    expect(especialidades.body).not.toBeNull();
+    expect(especialidadesJson.length).toBeGreaterThan(0);
 
-    expect(datosPersona.status).toEqual(200);
+    var especialidadId = JSON.stringify(especialidades.body[0]._id)
+    especialidadId = especialidadId.slice(1, -1) // PARA ELIMINAR LAS DOBLES COMILLAS
 
-    var datosHistoriaClinica = await request(app)
-      .post('/api/buscar_datos_historia_clinica')
-      .send({ _id: datosPersona.body.historia_clinica });
+    var tratamientosConEspecialidad = await request(app)
+      .get(`/api/especialidades/6564263ba1afde23972f91df/tratamientos_farmacologicos`)
 
-
-    expect(datosHistoriaClinica.status).toEqual(404);
-    expect(datosHistoriaClinica.body).toHaveProperty('error', true);
+    expect(tratamientosConEspecialidad.status).toEqual(404);
   }, 15000);
 
 });

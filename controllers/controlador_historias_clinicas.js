@@ -90,7 +90,6 @@ var controller = {
         const historicasClinicas = await historia_clinica.create([params], { session: session });
         hist_clinica = historicasClinicas[0];
         const histID = hist_clinica._id;
-        console.log("La nueva historia clìnica es: " + histID);
 
         //asigno historia clinica a persona
         await persona.updateOne(
@@ -101,11 +100,10 @@ var controller = {
           { session: session });
         //termino la transaccion 
         await session.commitTransaction();
-        console.log("Historia clinica creada y guardada con exito :D")
+        console.log("Historia clinica creada y guardada con exito.")
       }
     } catch (err) {
       await session.abortTransaction();
-      console.error("Error en la operacion: " + err);
       return res.status(500).send({
         error: true,
         status: 'error',
@@ -115,8 +113,7 @@ var controller = {
     session.endSession();
 
     return res.status(200).send({
-      status: 'Sucess',
-      hist_clinica,
+      status: 'Sucess'
     })
   },
   /*
