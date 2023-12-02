@@ -40,30 +40,10 @@ describe('Test de la transaccion alta historia clinica', () => {
   }, 30000);
 
   //Para la transaccion de alta historia clinica
-  //camino 1
-  //primera solicitud: buscar una persona que exista y que no tenga historia clinica  
-  it('La persona existe y no tiene historia clínica', async () => {
-    var idPersona = await request(app)
-      .post('/api/buscar_IdPersona')
-      .send({ apellido: 'Towers', documento: 39650255, tipo_documento: 'DNI', sexo: 'M' });
-    expect(idPersona.statusCode).toEqual(200);
-    expect(idPersona.body).not.toBeNull();
-
-    var idHC = await request(app)
-      .post('/api/buscar_Id_Historia_Clinica_Persona')
-      .send({ _id: idPersona.body })
-    expect(idHC.statusCode).toEqual(404);
-    expect(idHC.body).toHaveProperty('error', true);
-
-    var res = await request(app)
-      .post('/api/alta_historia_clinica')
-      .send({ grupo_sanguineo: 'A', factor_sanguineo: '+', _id: idPersona.body })
-    expect(res.statusCode).toEqual(200);
-  }, 15000);
   
-  //camino 2
-  //La persona no existe, le doy de alta, y le asigno una nueeva historia clínica  
-  it('La persona no existe, le doy de alta, y le asigno una nueeva historia clínica', async () => {
+  //camino 1
+  //La persona no existe, le doy de alta, y le asigno una nueva historia clínica  
+  it('La persona no existe, le doy de alta, y le asigno una nueva historia clínica', async () => {
     var idPersona = await request(app)
       .post('/api/buscar_IdPersona')
       .send({ apellido: 'Medhurs', documento: 33443222, tipo_documento: 'LE', sexo: 'F' });
@@ -84,7 +64,7 @@ describe('Test de la transaccion alta historia clinica', () => {
 
   }, 15000);
 
-  //camino 3
+  //camino 2
   //La persona no existe, y cuando le doy de alta, cargo datos con error
   //en este caso lo que genera el error es el ingreso de datos incorrecto
   it('La persona no existe, y cuando le doy de alta, cargo datos con error', async () => {
@@ -104,7 +84,7 @@ describe('Test de la transaccion alta historia clinica', () => {
 
   }, 15000);
 
-  //camino 4
+  //camino 3
   //La persona existe, y tiene historia clinica
   it('La persona existe, y tiene historia clinica', async () => {
     var idPersona = await request(app)
@@ -121,7 +101,7 @@ describe('Test de la transaccion alta historia clinica', () => {
 
   }, 15000);
 
-  //camino 5:
+  //camino 4
   //La persona existe, no tiene historia clínica, pero cargo mal los datos
   //El dato mal cargado es el grupo sanguineo
   it('La persona existe, no tiene historia clínica, pero cargo mal los datos', async () => {
@@ -143,10 +123,10 @@ describe('Test de la transaccion alta historia clinica', () => {
     expect(res.statusCode).toEqual(500);
   }, 15000);
 
-  //camino 6
+  //camino 5
   //La persona no existe, le doy de alta, y cuando le asigno una 
   //nueva historia clínica, cargo los datos de la misma con error  
-  it('La persona no existe, le doy de alta, y le asigno una nueeva historia clínica', async () => {
+  it('La persona no existe, le doy de alta, le asigno una nueva historia clínica, pero envío datos erroneos', async () => {
     var idPersona = await request(app)
       .post('/api/buscar_IdPersona')
       .send({ apellido: 'Medhurs', documento: 33443222, tipo_documento: 'LE', sexo: 'F' });
@@ -165,5 +145,25 @@ describe('Test de la transaccion alta historia clinica', () => {
       .send({ grupo_sanguineo: 'C', factor_sanguineo: '+', _id: nuevoIdPersona.body.id })
     expect(res.statusCode).toEqual(500);
 
+  }, 15000);
+  //camino 6
+  //Buscar una persona que exista y que no tenga historia clinica  
+  it('La persona existe y no tiene historia clínica', async () => {
+    var idPersona = await request(app)
+      .post('/api/buscar_IdPersona')
+      .send({ apellido: 'Towers', documento: 39650255, tipo_documento: 'DNI', sexo: 'M' });
+    expect(idPersona.statusCode).toEqual(200);
+    expect(idPersona.body).not.toBeNull();
+
+    var idHC = await request(app)
+      .post('/api/buscar_Id_Historia_Clinica_Persona')
+      .send({ _id: idPersona.body })
+    expect(idHC.statusCode).toEqual(404);
+    expect(idHC.body).toHaveProperty('error', true);
+
+    var res = await request(app)
+      .post('/api/alta_historia_clinica')
+      .send({ grupo_sanguineo: 'A', factor_sanguineo: '+', _id: idPersona.body })
+    expect(res.statusCode).toEqual(200);
   }, 15000);
 });

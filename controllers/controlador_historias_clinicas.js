@@ -198,9 +198,9 @@ var controller = {
 
     } catch (error) {
       console.log(error)
-      return res.status(500).send({
+      return res.status(404).send({
         error: true,
-        mesagge: 'Hubo un error en la elaboracion del informe del paciente.'
+        mesagge: 'La persona ingresada no existe en el sistema.'
       })
     }
 
@@ -271,9 +271,9 @@ var controller = {
       }
     } catch (error) {
       console.log(error)
-      return res.status(500).send({
+      return res.status(404).send({
         error: true,
-        mesagge: 'Hubo un error con los tratamientos farmacológicos.'
+        mesagge: 'La persona ingresada no existe en el sistema.'
       })
     }
 
