@@ -70,7 +70,7 @@ describe('Camino 6: Alta consulta', () => {
 
     expect(enfermedades.status).toEqual(200);
     var alta_consulta_y_diagnostico= await request(app)
-    .post('/api//alta_diagnostico_completo')
+    .post('/api/alta_diagnostico_completo')
     .send({
       "sintomas_consultas":"esta es la consulta de pruebas y es la parte de sintomas de la consulta la enfermedad es gripe",
       "observacion_consulta":"esta es la consulta de observaciones estoy probando,la enfermedad es gripe",

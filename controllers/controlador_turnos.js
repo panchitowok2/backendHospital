@@ -19,7 +19,7 @@ var controller_turno = {
       })
         .populate("persona");
         
-        console.log("paso el find");
+   
       if (!turnos || turnos.length===0) {
         return null;
 
@@ -76,7 +76,7 @@ var controller_turno = {
   obtener_turno: async (req, res) => {
     let params = req.body;
     try {
-      console.log("entro el request");
+    
       const turno_info = await controller_turno.buscar_turno(new Date(params.fecha), params.id_medico, params.id_paciente);
       if (!turno_info) {
         return res.status(404).send({

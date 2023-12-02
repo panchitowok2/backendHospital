@@ -12,11 +12,11 @@ var controller_consulta = {
       const consulta = await Consulta.findOne({ turno: new mongoose.Types.ObjectId(id_turno) });
 
       if (!consulta) {
-        console.log("entro al false de consulta?");
+       
         return false;
 
       }
-      console.log("se fue al true es decir esta enlazado");
+      
       return true;
     } catch (error) {
       throw new Error('No ha sido posible buscar si el turno ya fue asignado a una consulta');
@@ -52,9 +52,9 @@ var controller_consulta = {
     try {
       await session.startTransaction();
       const turno_enlazado = await controller_consulta.verificar_turno_enlazado(id_turno)
-      console.log("no paso el turno enlazado");
+     
       if (!turno_enlazado) {
-        console.log("paso el turno enlazado");
+      
         const turno = await Turno.findById(id_turno)
         const historia_clinica= await Historia_clinica.findById(id_historia_clinica)
         const id_medico = turno.medico;
