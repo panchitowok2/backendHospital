@@ -58,7 +58,7 @@ describe('Camino 3: buscar consultas por enfermedad', () => {
 
  var diagnosticos_enfermedad=await request(app)
  .post('/api/buscar_diagnosticos_solo_por_enfermedad')
- .send({"id_enfermedad":"651c8165c2688411e6edc9e5"})
+ .send({"id_enfermedad":"651c8165c2688411e6edc900"})
  
  expect(diagnosticos_enfermedad.status).toEqual(404);
  expect(diagnosticos_enfermedad.body).toHaveProperty('error', true);

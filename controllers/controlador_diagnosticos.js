@@ -333,14 +333,7 @@ var controller_diagnostico = {
     try {
       const params=req.body;
       const diagnosticos= await controller_diagnostico.buscar_diagnosticos_por_enfermedadDB(params.id_enfermedad)
-      console.log("paso el buscar");
-      console.log("paso el buscar");
-      console.log("paso el buscar");
-      console.log("paso el buscar");
-      console.log("paso el buscar");
-      console.log("paso el buscar");
-      console.log("paso el buscar");
-      console.log("paso el buscar");
+
       if (diagnosticos==null) {
         return res.status(404).json({
           error: true,
